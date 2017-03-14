@@ -49,8 +49,7 @@ State SimulationEngine::MakeMovement(Memory MemToMove)
                         }
                         else if(MemToMove.direction == 0)
                         {
-                                187
-                                        CurrentState.Displacement.x -=
+                                CurrentState.Displacement.x -=
                                         MemToMove.deltaT*0.5*cos(CurrentState.RPY.yaw);
                                 CurrentState.Displacement.y -=
                                         MemToMove.deltaT*0.5*sin(CurrentState.RPY.yaw);

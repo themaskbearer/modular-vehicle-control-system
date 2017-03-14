@@ -3,7 +3,8 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "StateTracker.h"
+#include "AIEngine.h"
+#include "SystemGPIOs.h"
 #include "ErrorHandler.h"
 #include "DataLogger.h"
 
@@ -26,7 +27,7 @@ int main()
         Controller.StartThread();
 
         while(1)
-                usleep(1000000);        
-        
+                usleep(1000000);
+
         return 0;
 }

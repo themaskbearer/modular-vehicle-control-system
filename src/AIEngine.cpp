@@ -315,4 +315,4 @@ string AIEngine::LogMemory(Memory mem)
 
     return str;
 }
-}
+
