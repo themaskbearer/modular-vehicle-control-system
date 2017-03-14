@@ -13,9 +13,7 @@
 #include <fstream>
 #include <string>
 #include <queue>
-using std::string;
-using std::queue;
-using std::ofstream;
+
 
 #include "Exceptions.h"
 #include "Thread.h"
@@ -23,31 +21,42 @@ using std::ofstream;
 
 class DataLogger : public Thread
 {
-private:
-    static sem_t Access;
-    ofstream datafile;
-    ofstream accelfile;
-    ofstream sensefile;
-    static queue<string> datalist;
-    static queue<string> accellist;
-    static queue<string> senselist;
-
-    void InitializeMembers(string FilePath);
-    void WriteQueuetoFile();
-    void WriteAcceltoFile();
-    void WriteSensetoFile();
-    std::ostream& writeStringtoStream(std::ostream& streamtowrite, string str);
-
-    void ThreadRoutine();
-
 public:
-    DataLogger();
-    DataLogger(string FilePath);
     virtual ~DataLogger();
 
-    static void recorddata(string Data);
-    static void recordaccel(string data);
-    static void recordsense(string data);
+    static DataLogger* instance() { if(m_instance == nullptr) m_instance = new DataLogger(); return m_instance; }
+
+    void initialize();
+    void close();
+
+    void recordData(std::string data);
+    void recordAccel(std::string data);
+    void recordSense(std::string data);
+
+private:
+    static DataLogger* m_instance;
+    DataLogger();
+
+    bool m_initialized = false;
+
+    sem_t m_access;
+    std::ofstream m_datafile;
+    std::ofstream m_accelfile;
+    std::ofstream m_sensefile;
+    std::queue<std::string> m_datalist;
+    std::queue<std::string> m_accellist;
+    std::queue<std::string> m_senselist;
+
+    void writeQueuetoFile();
+    void writeAcceltoFile();
+    void writeSensetoFile();
+    std::ostream& writeStringtoStream(std::ostream& streamtowrite, std::string str);
+
+    void threadRoutine();
 };
+
+
+#define DATA_LOGGER     DataLogger::instance()
+
 
 #endif /* DATALOGGER_H_ */

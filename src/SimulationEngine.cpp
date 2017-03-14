@@ -16,54 +16,53 @@ using std::abs;
 
 SimulationEngine::SimulationEngine()
 {
-        CurrentState = getEmptyState();
 }
 
 SimulationEngine::~SimulationEngine()
 {
 }
 
-State SimulationEngine::MakeMovement(Memory MemToMove)
+State SimulationEngine::makeMovement(Memory memToMove)
 {
-        switch(MemToMove.MotorUsed)
+        switch(memToMove.m_motorUsed)
         {
                 case 1:
-                        if(MemToMove.direction & 1)
-                                CurrentState.RPY.yaw += MemToMove.deltaT*M_PI/8;
+                        if(memToMove.m_direction & 1)
+                                CurrentState.m_angPosition.yaw += memToMove.m_timeElapsed_s*M_PI/8;
                         else
-                                CurrentState.RPY.yaw -= MemToMove.deltaT*M_PI/8;
+                                CurrentState.m_angPosition.yaw -= memToMove.m_timeElapsed_s*M_PI/8;
                         break;
                 case 2:
-                        if(MemToMove.direction & 2)
-                                CurrentState.RPY.yaw -= MemToMove.deltaT*M_PI/8;
+                        if(memToMove.m_direction & 2)
+                                CurrentState.m_angPosition.yaw -= memToMove.m_timeElapsed_s*M_PI/8;
                         else
-                                CurrentState.RPY.yaw += MemToMove.deltaT*M_PI/8;
+                                CurrentState.m_angPosition.yaw += memToMove.m_timeElapsed_s*M_PI/8;
                         break;
                 case 3:
-                        if(MemToMove.direction == 3)
+                        if(memToMove.m_direction == 3)
                         {
-                                CurrentState.Displacement.x +=
-                                        MemToMove.deltaT*0.5*cos(CurrentState.RPY.yaw);
-                                CurrentState.Displacement.y +=
-                                        MemToMove.deltaT*0.5*sin(CurrentState.RPY.yaw);
+                                CurrentState.m_displacement.x +=
+                                        memToMove.m_timeElapsed_s*0.5*cos(CurrentState.m_angPosition.yaw);
+                                CurrentState.m_displacement.y +=
+                                        memToMove.m_timeElapsed_s*0.5*sin(CurrentState.m_angPosition.yaw);
                         }
-                        else if(MemToMove.direction == 0)
+                        else if(memToMove.m_direction == 0)
                         {
-                                CurrentState.Displacement.x -=
-                                        MemToMove.deltaT*0.5*cos(CurrentState.RPY.yaw);
-                                CurrentState.Displacement.y -=
-                                        MemToMove.deltaT*0.5*sin(CurrentState.RPY.yaw);
+                                CurrentState.m_displacement.x -=
+                                        memToMove.m_timeElapsed_s*0.5*cos(CurrentState.m_angPosition.yaw);
+                                CurrentState.m_displacement.y -=
+                                        memToMove.m_timeElapsed_s*0.5*sin(CurrentState.m_angPosition.yaw);
                         }
-                        else if(MemToMove.direction == 1)
-                                CurrentState.RPY.yaw += MemToMove.deltaT*M_PI/4;
+                        else if(memToMove.m_direction == 1)
+                                CurrentState.m_angPosition.yaw += memToMove.m_timeElapsed_s*M_PI/4;
                         else
-                                CurrentState.RPY.yaw -= MemToMove.deltaT*M_PI/4;
+                                CurrentState.m_angPosition.yaw -= memToMove.m_timeElapsed_s*M_PI/4;
                         break;
         }
         return CurrentState;
 }
 
-State SimulationEngine::GetInitialState()
+State SimulationEngine::getInitialState()
 {
         return CurrentState;
 }

@@ -7,17 +7,19 @@
 
 #ifndef SIMULATIONENGINE_H_
 #define SIMULATIONENGINE_H_
+
 #include "Memory.h"
 
 class SimulationEngine
 {
-        private:
-                State CurrentState;
-        public:
-                SimulationEngine();
-                virtual ~SimulationEngine();
-                State MakeMovement(Memory MemToMove);
-                State GetInitialState();
+private:
+    State CurrentState;
+
+public:
+    SimulationEngine();
+    virtual ~SimulationEngine();
+    State makeMovement(Memory memToMove);
+    State getInitialState();
 };
 
 #endif /* SIMULATIONENGINE_H_ */

@@ -9,166 +9,167 @@
 #include "ErrorHandler.h"
 
 #include <iostream>
-using std::cout;
-using std::endl;
 
-queue<string> DataLogger::datalist;
-queue<string> DataLogger::accellist;
-queue<string> DataLogger::senselist;
-sem_t DataLogger::Access;
+
+DataLogger* DataLogger::m_instance = nullptr;
+
 
 DataLogger::DataLogger()
 {
-    InitializeMembers("datalog.log");
+
 }
-
-
-DataLogger::DataLogger(std::string FilePath)
-{
-    InitializeMembers(FilePath);
-}
-
-
-void DataLogger::InitializeMembers(string FilePath)
-{
-    int error = sem_init(&Access, 0, 1);
-    if(error == -1)
-        ErrorHandler::recorderror(Exception("Can't initialize semaphore for data logger..."));
-
-    datafile.open(FilePath.c_str(), std::istream::app);
-    if(!datafile.is_open())
-        ErrorHandler::recorderror(Exception("Can't open data file log...\n"));
-    else
-        datafile << endl << endl << endl << "NEW SESSION" << endl;
-
-    accelfile.open("accel.dat", std::istream::app);
-    if(!accelfile.is_open())
-        ErrorHandler::recorderror(Exception("Can't open accel file log...\n"));
-
-    sensefile.open("sense.dat", std::istream::app);
-    if(!sensefile.is_open())
-        ErrorHandler::recorderror(Exception("Can't open sense file log...\n"));
-}
-
 
 DataLogger::~DataLogger()
 {
-    datafile.close();
-    accelfile.close();
-    sensefile.close();
-    sem_destroy(&Access);
+    if(m_initialized)
+        close();
 }
 
 
-void DataLogger::ThreadRoutine()
+void DataLogger::initialize()
+{
+    int error = sem_init(&m_access, 0, 1);
+    if(error == -1)
+        ERROR_HANDLER->recordError(Exception("Can't initialize semaphore for data logger..."));
+
+    m_datafile.open("data.log", std::istream::app);
+    if(!m_datafile.is_open())
+        ERROR_HANDLER->recordError(Exception("Can't open data file log...\n"));
+    else
+        m_datafile << "\n\n\nNEW SESSION\n";
+
+    m_accelfile.open("accel.dat", std::istream::app);
+    if(!m_accelfile.is_open())
+        ERROR_HANDLER->recordError(Exception("Can't open accel file log...\n"));
+
+    m_sensefile.open("sense.dat", std::istream::app);
+    if(!m_sensefile.is_open())
+        ERROR_HANDLER->recordError(Exception("Can't open sense file log...\n"));
+
+    m_initialized = true;
+}
+
+
+void DataLogger::close()
+{
+    m_initialized = false;
+
+    m_datafile.close();
+    m_accelfile.close();
+    m_sensefile.close();
+    sem_destroy(&m_access);
+}
+
+
+void DataLogger::threadRoutine()
 {
     while(true)
     {
-        if(!datalist.empty())
-            WriteQueuetoFile();
-        if(!accellist.empty())
-            WriteAcceltoFile();
-        if(!senselist.empty())
-            WriteSensetoFile();
+        if(!m_datalist.empty())
+            writeQueuetoFile();
+        if(!m_accellist.empty())
+            writeAcceltoFile();
+        if(!m_senselist.empty())
+            writeSensetoFile();
 
         usleep(1000);
     }
 }
 
 
-void DataLogger::WriteQueuetoFile()
+void DataLogger::writeQueuetoFile()
 {
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        while(!datalist.empty())
+        while(!m_datalist.empty())
         {
-            writeStringtoStream(datafile, datalist.front());
-            datalist.pop();
+            writeStringtoStream(m_datafile, m_datalist.front());
+            m_datalist.pop();
         }
 
-        sem_post(&Access);
+        sem_post(&m_access);
     }
     else
     {
-        ErrorHandler::recorderror(Exception("Can't get access to queue to log data...\n"));
+        ERROR_HANDLER->recordError(Exception("Can't get access to queue to log data...\n"));
     }
 }
 
 
-void DataLogger::WriteAcceltoFile()
+void DataLogger::writeAcceltoFile()
 {
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        while(!accellist.empty())
+        while(!m_accellist.empty())
         {
-            writeStringtoStream(accelfile, accellist.front());
-            accellist.pop();
+            writeStringtoStream(m_accelfile, m_accellist.front());
+            m_accellist.pop();
         }
 
-        sem_post(&Access);
+        sem_post(&m_access);
     }
 }
 
 
-void DataLogger::WriteSensetoFile()
+void DataLogger::writeSensetoFile()
 {
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        while(!senselist.empty())
+        while(!m_senselist.empty())
         {
-            writeStringtoStream(sensefile, senselist.front());
-            senselist.pop();
+            writeStringtoStream(m_sensefile, m_senselist.front());
+            m_senselist.pop();
         }
 
-        sem_post(&Access);
+        sem_post(&m_access);
     }
 }
 
 
-std::ostream& DataLogger::writeStringtoStream(std::ostream& streamtowrite, string str)
+std::ostream& DataLogger::writeStringtoStream(std::ostream& streamtowrite, std::string str)
 {
-    streamtowrite << str << endl;
+    streamtowrite << str << std::endl;
     return streamtowrite;
 }
 
 
-void DataLogger::recorddata(string Data)
+void DataLogger::recordData(std::string data)
 {
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        datalist.push(Data);
-        sem_post(&Access);
+        m_datalist.push(data);
+        sem_post(&m_access);
     }
     else
     {
-        ErrorHandler::recorderror(Exception("Can't get access to queue to give data...\n"));
+        ERROR_HANDLER->recordError(Exception("Can't get access to queue to give data...\n"));
     }
 }
 
 
-void DataLogger::recordaccel(string data)
+void DataLogger::recordAccel(string data)
 {
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        accellist.push(data);
-        sem_post(&Access);
+        m_accellist.push(data);
+        sem_post(&m_access);
     }
     else
     {
-        ErrorHandler::recorderror(Exception("Can't get access to queue to give accel...\n"));
+        ERROR_HANDLER->recordError(Exception("Can't get access to queue to give accel...\n"));
     }
 }
 
 
-void DataLogger::recordsense(string data)
+void DataLogger::recordSense(string data)
 {
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        senselist.push(data);
-        sem_post(&Access);
+        m_senselist.push(data);
+        sem_post(&m_access);
     }
     else
     {
-        ErrorHandler::recorderror(Exception("Can't get access to queue to give sense...\n"));
+        ERROR_HANDLER->recordError(Exception("Can't get access to queue to give sense...\n"));
     }
 }

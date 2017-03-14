@@ -20,27 +20,25 @@ using std::pow;
 
 StateTracker::StateTracker()
 {
-    CurrentState = LastState = getEmptyState();
+    m_R.push_back(1);
+    m_R.push_back(0);
+    m_R.push_back(0);
 
-    R.push_back(1);
-    R.push_back(0);
-    R.push_back(0);
+    m_R.push_back(0);
+    m_R.push_back(1);
+    m_R.push_back(0);
 
-    R.push_back(0);
-    R.push_back(1);
-    R.push_back(0);
-
-    R.push_back(0);
-    R.push_back(0);
-    R.push_back(1);
+    m_R.push_back(0);
+    m_R.push_back(0);
+    m_R.push_back(1);
 
     for(int i = 0; i < 3; i++)
     {
-        AccelCounter[i] = 0;
-        BiasFilter[i] = 0;
+        m_accelCounter[i] = 0;
+        m_biasFilter[i] = 0;
     }
 
-    int error = sem_init(&Access, 0, 1);
+    int error = sem_init(&m_access, 0, 1);
     if(error == -1)
         throw Exception("Failed to create semaphore for StateTracker");
 }
@@ -48,17 +46,17 @@ StateTracker::StateTracker()
 
 StateTracker::~StateTracker()
 {
-    sem_destroy(&Access);
+    sem_destroy(&m_access);
 }
 
 
-void StateTracker::ThreadRoutine()
+void StateTracker::threadRoutine()
 {
     initializeOrientation();
 
     while(true)
     {
-        sensordata readings = sensors.getSensorData();
+        SensorData readings = m_sensors.getSensorData();
         updateState(readings);
 
         usleep(7100);
@@ -68,14 +66,14 @@ void StateTracker::ThreadRoutine()
 
 void StateTracker::initializeOrientation()
 {
-    sensordata Initial = sensors.getSensorData();
+    SensorData Initial = m_sensors.getSensorData();
 
     float g = atan2((float)Initial.Accelerometer.Y, (float)Initial.Accelerometer.Z);
     float b = asin(-(float)Initial.Accelerometer.X/GMAG);
     float a = 0;
 
-    vector<float> temp = CreateRotationMatrix(a, b, g);
-    R = MultiplyRMatrix(R, temp);
+    vector<float> temp = createRotationMatrix(a, b, g);
+    m_R = multiplyRMatrix(m_R, temp);
 
 //    CurrentState.RPY.pitch = g;
 //    CurrentState.RPY.roll = b;
@@ -89,54 +87,54 @@ void StateTracker::initializeOrientation()
 }
 
 
-void StateTracker::updateState(sensordata data)
+void StateTracker::updateState(SensorData data)
 {
-    CurrentState.AngVelocity.roll = (data.Gyro.Y - GYROY_BIAS)*GYRO_SCALE_FCTR*RADIANS;
-    CurrentState.AngVelocity.pitch = (data.Gyro.X - GYROX_BIAS)*GYRO_SCALE_FCTR*RADIANS;
-    CurrentState.AngVelocity.yaw = (data.Gyro.Z - GYROZ_BIAS)*GYRO_SCALE_FCTR*RADIANS;
+    m_currentState.m_angVelocity.roll = (data.Gyro.Y - GYROY_BIAS)*GYRO_SCALE_FCTR*RADIANS;
+    m_currentState.m_angVelocity.pitch = (data.Gyro.X - GYROX_BIAS)*GYRO_SCALE_FCTR*RADIANS;
+    m_currentState.m_angVelocity.yaw = (data.Gyro.Z - GYROZ_BIAS)*GYRO_SCALE_FCTR*RADIANS;
 
-    float a = CurrentState.AngVelocity.yaw*DELTA_T;
-    float b = CurrentState.AngVelocity.roll*DELTA_T;
-    float g = CurrentState.AngVelocity.pitch*DELTA_T;
+    float a = m_currentState.m_angVelocity.yaw*DELTA_T;
+    float b = m_currentState.m_angVelocity.roll*DELTA_T;
+    float g = m_currentState.m_angVelocity.pitch*DELTA_T;
 
-    vector<float> temp = CreateRotationMatrix(a, b, g);
-    R = MultiplyRMatrix(R, temp);
+    vector<float> temp = createRotationMatrix(a, b, g);
+    m_R = multiplyRMatrix(m_R, temp);
 
-    float xg = R[6]*GMAG;
-    float yg = R[7]*GMAG;
-    float zg = R[8]*GMAG;
+    float xg = m_R[6]*GMAG;
+    float yg = m_R[7]*GMAG;
+    float zg = m_R[8]*GMAG;
 
-    CurrentState.Acceleration.x = data.Accelerometer.X - xg;
-    CurrentState.Acceleration.y = data.Accelerometer.Y - yg;
-    CurrentState.Acceleration.z = data.Accelerometer.Z - zg;
+    m_currentState.m_acceleration.x = data.Accelerometer.X - xg;
+    m_currentState.m_acceleration.y = data.Accelerometer.Y - yg;
+    m_currentState.m_acceleration.z = data.Accelerometer.Z - zg;
 
     vector<float> p(3, 0);
 
-    p[0] = CurrentState.Acceleration.x;
-    p[1] = CurrentState.Acceleration.y;
-    p[2] = CurrentState.Acceleration.z;
+    p[0] = m_currentState.m_acceleration.x;
+    p[1] = m_currentState.m_acceleration.y;
+    p[2] = m_currentState.m_acceleration.z;
 
-    p = MultiplyPosition(R, p);
+    p = multiplyPosition(m_R, p);
 
-    CurrentState.Acceleration.x = p[0];
-    CurrentState.Acceleration.y = p[1];
-    CurrentState.Acceleration.z = p[2];
+    m_currentState.m_acceleration.x = p[0];
+    m_currentState.m_acceleration.y = p[1];
+    m_currentState.m_acceleration.z = p[2];
 
-    CurrentState.RPY.roll = atan2(-R[6], sqrt(pow(R[0],2) + pow(R[3],2)));
-    CurrentState.RPY.yaw = atan2(R[3]/cos(CurrentState.RPY.roll), R[0]/cos(CurrentState.RPY.roll));
-    CurrentState.RPY.pitch = atan2(R[7]/cos(CurrentState.RPY.roll), R[8]/cos(CurrentState.RPY.roll));
+    m_currentState.m_angPosition.roll = atan2(-m_R[6], sqrt(pow(m_R[0],2) + pow(m_R[3],2)));
+    m_currentState.m_angPosition.yaw = atan2(m_R[3]/cos(m_currentState.m_angPosition.roll), m_R[0]/cos(m_currentState.m_angPosition.roll));
+    m_currentState.m_angPosition.pitch = atan2(m_R[7]/cos(m_currentState.m_angPosition.roll), m_R[8]/cos(m_currentState.m_angPosition.roll));
 
     float *accel, *vel, *pos;
 
-    accel = &CurrentState.Acceleration.x;
-    vel = &CurrentState.Velocity.x;
-    pos = &CurrentState.Displacement.x;
+    accel = &m_currentState.m_acceleration.x;
+    vel = &m_currentState.m_velocity.x;
+    pos = &m_currentState.m_displacement.x;
 
     float *lastaccel, *lastvel, *lastpos;
 
-    lastaccel = &LastState.Acceleration.x;
-    lastvel = &LastState.Velocity.x;
-    lastpos = &LastState.Displacement.x;
+    lastaccel = &m_lastState.m_acceleration.x;
+    lastvel = &m_lastState.m_velocity.x;
+    lastpos = &m_lastState.m_displacement.x;
 
     //Begin Acceleration processing
 
@@ -145,21 +143,21 @@ void StateTracker::updateState(sensordata data)
         *accel = (*accel)*ACCEL_SCALE_FCTR*G_CONVERSION;
         *accel = *lastaccel + (*accel - *lastaccel)*ALPHA;
 
-        BiasFilter[i] = BiasFilter[i] + (*accel - BiasFilter[i])*HEAVY_ALPHA;
-        *accel = *accel - BiasFilter[i];
+        m_biasFilter[i] = m_biasFilter[i] + (*accel - m_biasFilter[i])*HEAVY_ALPHA;
+        *accel = *accel - m_biasFilter[i];
 
         if((*accel - *lastaccel) < 0.05 )
         {
-            AccelCounter[i]++;
+            m_accelCounter[i]++;
         }
         else
         {
-            AccelCounter[i] = 0;
+            m_accelCounter[i] = 0;
         }
 
         float adjaccel = *accel;
 
-        if(AccelCounter[i] >= 33)
+        if(m_accelCounter[i] >= 33)
         {
             float error = (-(*lastvel));
             adjaccel = error*P;
@@ -177,15 +175,15 @@ void StateTracker::updateState(sensordata data)
         lastpos++;
     }
 
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        LastState = CurrentState;
-        sem_post(&Access);
+        m_lastState = m_currentState;
+        sem_post(&m_access);
     }
 }
 
 
-vector<float> StateTracker::CreateRotationMatrix(float a, float b, float g)
+vector<float> StateTracker::createRotationMatrix(float a, float b, float g)
 {
     vector<float> R;
 
@@ -205,7 +203,7 @@ vector<float> StateTracker::CreateRotationMatrix(float a, float b, float g)
 }
 
 
-vector<float> StateTracker::MultiplyRMatrix(vector<float> R, vector<float> Rb)
+vector<float> StateTracker::multiplyRMatrix(vector<float> R, vector<float> Rb)
 {
     vector<float> ReturnedMatrix(9, 0);
 
@@ -218,7 +216,7 @@ vector<float> StateTracker::MultiplyRMatrix(vector<float> R, vector<float> Rb)
 }
 
 
-vector<float> StateTracker::MultiplyPosition(vector<float> R, vector<float> p)
+vector<float> StateTracker::multiplyPosition(vector<float> R, vector<float> p)
 {
     vector<float> ReturnedMatrix(3, 0);
 
@@ -232,12 +230,12 @@ vector<float> StateTracker::MultiplyPosition(vector<float> R, vector<float> p)
 
 State StateTracker::getCurrentState()
 {
-    State ReturnedState = getEmptyState();
+    State ReturnedState;
 
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        ReturnedState = LastState;
-        sem_post(&Access);
+        ReturnedState = m_lastState;
+        sem_post(&m_access);
     }
 
     return ReturnedState;

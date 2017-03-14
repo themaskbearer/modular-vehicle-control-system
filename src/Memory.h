@@ -12,46 +12,45 @@
 using std::istream;
 using std::ostream;
 
-struct axesprojection
+struct AxesProjection
 {
-    float x;
-    float y;
-    float z;
+    float x = 0;
+    float y = 0;
+    float z = 0;
 };
 
-struct rotprojection
+struct RotProjection
 {
-    float roll;
-    float pitch;
-    float yaw;
+    float roll = 0;
+    float pitch = 0;
+    float yaw = 0;
 };
 
 struct State
 {
-    axesprojection Displacement;
-    axesprojection Velocity;
-    axesprojection Acceleration;
-    rotprojection RPY;
-    rotprojection AngVelocity;
-    rotprojection AngAcceleration;
-};
+    AxesProjection m_displacement;
+    AxesProjection m_velocity;
+    AxesProjection m_acceleration;
 
-State getEmptyState();
+    RotProjection m_angPosition;
+    RotProjection m_angVelocity;
+    RotProjection m_angAcceleration;
+};
 
 class Memory
 {
 public:
-    State Initial;
-    State Final;
-
-    int MotorUsed;
-    int direction;
-    float deltaT;
-
-    float confidence;
-
     Memory();
     virtual ~Memory();
+
+    State m_initial;
+    State m_final;
+
+    int m_motorUsed;
+    int m_direction;
+    float m_timeElapsed_s;
+
+    float m_confidence;
 };
 
 istream &operator>>(istream &strm, Memory mem);

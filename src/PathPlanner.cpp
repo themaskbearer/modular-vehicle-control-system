@@ -9,16 +9,16 @@ PathPlanner::PathPlanner()
 {
     Locations.clear();
 
-    State temp = getEmptyState();
+    State temp;
     Locations.push_back(temp);
 
-    temp.Displacement.x = 3;
+    temp.m_displacement.x = 3;
     Locations.push_back(temp);
 
-    temp.Displacement.y = 2;
+    temp.m_displacement.y = 2;
     Locations.push_back(temp);
 
-    temp.Displacement.x = 0;
+    temp.m_displacement.x = 0;
     Locations.push_back(temp);
 
     CurrentTarget = Locations.begin();
@@ -39,8 +39,8 @@ State PathPlanner::GetTarget()
 void PathPlanner::UpdateTarget(State CurrentState)
 {
     State positionerror = CurrentState - *CurrentTarget;
-    float err = pow(positionerror.Displacement.x,2) + pow(positionerror.Displacement.y, 2) +
-            pow(positionerror.Displacement.z, 2);
+    float err = pow(positionerror.m_displacement.x,2) + pow(positionerror.m_displacement.y, 2) +
+            pow(positionerror.m_displacement.z, 2);
     err = sqrt(err);
 
     if(err < 0.2)

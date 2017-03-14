@@ -13,18 +13,18 @@ using std::endl;
 
 int main()
 {
-        ErrorHandler handler;
-        handler.StartThread();
+        ERROR_HANDLER->initialize("errors.log");
+        ERROR_HANDLER->startThread();
 
-        DataLogger logger;
-        logger.StartThread();
+        DATA_LOGGER->initialize();
+        DATA_LOGGER->startThread();
 
         usleep(300000000); //5 mins
 
         SystemGPIOs IOs;
 
         AIEngine Controller;
-        Controller.StartThread();
+        Controller.startThread();
 
         while(1)
                 usleep(1000000);

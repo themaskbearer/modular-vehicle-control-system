@@ -17,23 +17,23 @@
 
 class AIEngine: public Thread
 {
-        private:
-                PathPlanner Navigator;
-                StateTracker IMU;
-                double Confidence;
-                vector<Memory> Memories;
-                vector<Motor> Motors;
-        
-                void ThreadRoutine();
-                Memory* getBestMemory(State Target);
-                void ExecuteMemory(Memory mem);
-        
-                float CompareStates(State state1, State state2);
-                string LogMemory(Memory mem);
+public:
+    AIEngine();
+    virtual ~AIEngine();
 
-        public:
-                AIEngine();
-                virtual ~AIEngine();
+private:
+    PathPlanner m_navigator;
+    StateTracker m_imu;
+    double m_confidence;
+    vector<Memory> m_memories;
+    vector<Motor> m_Motors;
+
+    void threadRoutine();
+    Memory* getBestMemory(State Target);
+    void executeMemory(Memory mem);
+
+    float compareStates(State state1, State state2);
+    string logMemory(Memory mem);
 };
 
 #endif /* AIENGINE_H_ */

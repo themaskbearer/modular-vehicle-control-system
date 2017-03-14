@@ -12,16 +12,16 @@
 
 AIEngine::AIEngine()
 {
-    Motors.clear();
-    Motors.push_back(Motor(MOTOR1DIR, MOTOR1EN));
-    Motors.push_back(Motor(MOTOR2DIR, MOTOR2EN));
+    m_Motors.clear();
+    m_Motors.push_back(Motor(MOTOR1DIR, MOTOR1EN));
+    m_Motors.push_back(Motor(MOTOR2DIR, MOTOR2EN));
     //Motors.push_back(Motor(MOTOR3DIR, MOTOR3EN));
 
-    Memories.clear();
+    m_memories.clear();
 
-    Confidence = 0;
+    m_confidence = 0;
 
-    IMU.StartThread();
+    m_imu.startThread();
 }
 
 
@@ -30,45 +30,45 @@ AIEngine::~AIEngine()
 }
 
 
-void AIEngine::ThreadRoutine()
+void AIEngine::threadRoutine()
 {
     string logstring = "";
 
     // if(Confidence < CONFIDENCE_LEVEL)
     // {
         int MotorNumber = 1;
-        for (vector<Motor>::iterator iter = Motors.begin(); iter != Motors.end(); iter++)
+        for (vector<Motor>::iterator iter = m_Motors.begin(); iter != m_Motors.end(); iter++)
         {
             for (int t = 2; t < 8; t += 2)
             {
                 Memory NewMem;
-                NewMem.Initial = IMU.getCurrentState();
-                NewMem.deltaT = t;
-                NewMem.MotorUsed = MotorNumber;
-                NewMem.direction = MotorNumber;
-                ExecuteMemory(NewMem);
-                NewMem.Final = IMU.getCurrentState();
-                NewMem.confidence = 50;
-                Memories.push_back(NewMem);
+                NewMem.m_initial = m_imu.getCurrentState();
+                NewMem.m_timeElapsed_s = t;
+                NewMem.m_motorUsed = MotorNumber;
+                NewMem.m_direction = MotorNumber;
+                executeMemory(NewMem);
+                NewMem.m_final = m_imu.getCurrentState();
+                NewMem.m_confidence = 50;
+                m_memories.push_back(NewMem);
 
                 logstring = "new memory ";
-                logstring += LogMemory(NewMem);
-                DataLogger::recorddata(logstring);
+                logstring += logMemory(NewMem);
+                DATA_LOGGER->recordData(logstring);
 
                 usleep(2000000);
 
-                NewMem.Initial = IMU.getCurrentState();
-                NewMem.deltaT = t;
-                NewMem.MotorUsed = MotorNumber;
-                NewMem.direction = 0;
-                ExecuteMemory(NewMem);
-                NewMem.Final = IMU.getCurrentState();
-                NewMem.confidence = 50;
-                Memories.push_back(NewMem);
+                NewMem.m_initial = m_imu.getCurrentState();
+                NewMem.m_timeElapsed_s = t;
+                NewMem.m_motorUsed = MotorNumber;
+                NewMem.m_direction = 0;
+                executeMemory(NewMem);
+                NewMem.m_final = m_imu.getCurrentState();
+                NewMem.m_confidence = 50;
+                m_memories.push_back(NewMem);
 
                 logstring = "new memory ";
-                logstring += LogMemory(NewMem);
-                DataLogger::recorddata(logstring);
+                logstring += logMemory(NewMem);
+                DATA_LOGGER->recordData(logstring);
 
                 usleep(2000000);
             }
@@ -81,33 +81,33 @@ void AIEngine::ThreadRoutine()
         for (int t = 2; t < 8; t += 2)
         {
             Memory NewMem;
-            NewMem.Initial = IMU.getCurrentState();
-            NewMem.deltaT = t;
-            NewMem.MotorUsed = 3;
-            NewMem.direction = 3;
-            ExecuteMemory(NewMem);
-            NewMem.Final = IMU.getCurrentState();
-            NewMem.confidence = 50;
-            Memories.push_back(NewMem);
+            NewMem.m_initial = m_imu.getCurrentState();
+            NewMem.m_timeElapsed_s = t;
+            NewMem.m_motorUsed = 3;
+            NewMem.m_direction = 3;
+            executeMemory(NewMem);
+            NewMem.m_final = m_imu.getCurrentState();
+            NewMem.m_confidence = 50;
+            m_memories.push_back(NewMem);
 
             logstring = "new memory ";
-            logstring += LogMemory(NewMem);
-            DataLogger::recorddata(logstring);
+            logstring += logMemory(NewMem);
+            DATA_LOGGER->recordData(logstring);
 
             usleep(2000000);
 
-            NewMem.Initial = IMU.getCurrentState();
-            NewMem.deltaT = t;
-            NewMem.MotorUsed = 3;
-            NewMem.direction = 0;
-            ExecuteMemory(NewMem);
-            NewMem.Final = IMU.getCurrentState();
-            NewMem.confidence = 50;
-            Memories.push_back(NewMem);
+            NewMem.m_initial = m_imu.getCurrentState();
+            NewMem.m_timeElapsed_s = t;
+            NewMem.m_motorUsed = 3;
+            NewMem.m_direction = 0;
+            executeMemory(NewMem);
+            NewMem.m_final = m_imu.getCurrentState();
+            NewMem.m_confidence = 50;
+            m_memories.push_back(NewMem);
 
             logstring = "new memory ";
-            logstring += LogMemory(NewMem);
-            DataLogger::recorddata(logstring);
+            logstring += logMemory(NewMem);
+            DATA_LOGGER->recordData(logstring);
 
             usleep(2000000);
         }
@@ -117,33 +117,33 @@ void AIEngine::ThreadRoutine()
         for (int t = 2; t < 8; t += 2)
         {
             Memory NewMem;
-            NewMem.Initial = IMU.getCurrentState();
-            NewMem.deltaT = t;
-            NewMem.MotorUsed = 3;
-            NewMem.direction = 1;
-            ExecuteMemory(NewMem);
-            NewMem.Final = IMU.getCurrentState();
-            NewMem.confidence = 50;
-            Memories.push_back(NewMem);
+            NewMem.m_initial = m_imu.getCurrentState();
+            NewMem.m_timeElapsed_s = t;
+            NewMem.m_motorUsed = 3;
+            NewMem.m_direction = 1;
+            executeMemory(NewMem);
+            NewMem.m_final = m_imu.getCurrentState();
+            NewMem.m_confidence = 50;
+            m_memories.push_back(NewMem);
 
             logstring = "new memory ";
-            logstring += LogMemory(NewMem);
-            DataLogger::recorddata(logstring);
+            logstring += logMemory(NewMem);
+            DATA_LOGGER->recordData(logstring);
 
             usleep(2000000);
 
-            NewMem.Initial = IMU.getCurrentState();
-            NewMem.deltaT = t;
-            NewMem.MotorUsed = 3;
-            NewMem.direction = 2;
-            ExecuteMemory(NewMem);
-            NewMem.Final = IMU.getCurrentState();
-            NewMem.confidence = 50;
-            Memories.push_back(NewMem);
+            NewMem.m_initial = m_imu.getCurrentState();
+            NewMem.m_timeElapsed_s = t;
+            NewMem.m_motorUsed = 3;
+            NewMem.m_direction = 2;
+            executeMemory(NewMem);
+            NewMem.m_final = m_imu.getCurrentState();
+            NewMem.m_confidence = 50;
+            m_memories.push_back(NewMem);
 
             logstring = "new memory ";
-            logstring += LogMemory(NewMem);
-            DataLogger::recorddata(logstring);
+            logstring += logMemory(NewMem);
+            DATA_LOGGER->recordData(logstring);
 
             usleep(2000000);
         }
@@ -152,90 +152,90 @@ void AIEngine::ThreadRoutine()
     //driving phase
     while (1)
     {
-        State Initial = IMU.getCurrentState();
-        Navigator.UpdateTarget(Initial);
-        State Target = Navigator.GetTarget();
+        State Initial = m_imu.getCurrentState();
+        m_navigator.UpdateTarget(Initial);
+        State Target = m_navigator.GetTarget();
 
         logstring = "target ";
-        logstring = logstring + Target.Displacement.x + " " + Target.Displacement.y + " " + Target.Displacement.z;
-        DataLogger::recorddata(logstring);
+        logstring = logstring + Target.m_displacement.x + " " + Target.m_displacement.y + " " + Target.m_displacement.z;
+        DATA_LOGGER->recordData(logstring);
 
         Target = Initial - Target;
 
         logstring = "diff ";
-        logstring = logstring + Target.Displacement.x + " " + Target.Displacement.y + " " + Target.Displacement.z + " "
-                + Target.RPY.roll + " " + Target.RPY.pitch + " " + Target.RPY.yaw;
-        DataLogger::recorddata(logstring);
+        logstring = logstring + Target.m_displacement.x + " " + Target.m_displacement.y + " " + Target.m_displacement.z + " "
+                + Target.m_angPosition.roll + " " + Target.m_angPosition.pitch + " " + Target.m_angPosition.yaw;
+        DATA_LOGGER->recordData(logstring);
 
         Memory* ActiontoTake = getBestMemory(Target);
 
         logstring = "chosen memory ";
-        logstring += LogMemory(*ActiontoTake);
-        DataLogger::recorddata(logstring);
+        logstring += logMemory(*ActiontoTake);
+        DATA_LOGGER->recordData(logstring);
 
-        State prediction = ActiontoTake->Final - ActiontoTake->Initial;
+        State prediction = ActiontoTake->m_final - ActiontoTake->m_initial;
 
         logstring = "prediction ";
-        logstring = logstring + prediction.Displacement.x + " " + prediction.Displacement.y + " "
-                + prediction.Displacement.z + " " + prediction.RPY.roll + " " + prediction.RPY.pitch + " "
-                + prediction.RPY.yaw;
-        DataLogger::recorddata(logstring);
+        logstring = logstring + prediction.m_displacement.x + " " + prediction.m_displacement.y + " "
+                + prediction.m_displacement.z + " " + prediction.m_angPosition.roll + " " + prediction.m_angPosition.pitch + " "
+                + prediction.m_angPosition.yaw;
+        DATA_LOGGER->recordData(logstring);
 
-        ExecuteMemory(*ActiontoTake);
+        executeMemory(*ActiontoTake);
 
-        State Final = IMU.getCurrentState();
+        State Final = m_imu.getCurrentState();
         State diff = Final - Initial;
 
         logstring = "result ";
-        logstring = logstring + diff.Displacement.x + " " + diff.Displacement.y + " " + diff.Displacement.z + " "
-                + diff.RPY.roll + " " + diff.RPY.pitch + " " + diff.RPY.yaw;
-        DataLogger::recorddata(logstring);
+        logstring = logstring + diff.m_displacement.x + " " + diff.m_displacement.y + " " + diff.m_displacement.z + " "
+                + diff.m_angPosition.roll + " " + diff.m_angPosition.pitch + " " + diff.m_angPosition.yaw;
+        DATA_LOGGER->recordData(logstring);
 
-        float opt = CompareStates(diff, prediction);
-        float ideal = CompareStates(prediction, prediction);
+        float opt = compareStates(diff, prediction);
+        float ideal = compareStates(prediction, prediction);
 
         logstring = "opt= ";
         logstring = logstring + opt + " ideal= " + ideal;
-        DataLogger::recorddata(logstring);
+        DATA_LOGGER->recordData(logstring);
 
         if (opt <= ideal && opt > (0.5 * ideal))
         {
-            ActiontoTake->confidence += 10;
-            if (ActiontoTake->confidence > 100)
-                ActiontoTake->confidence = 100;
+            ActiontoTake->m_confidence += 10;
+            if (ActiontoTake->m_confidence > 100)
+                ActiontoTake->m_confidence = 100;
 
             logstring = "memory correct";
-            DataLogger::recorddata(logstring);
+            DATA_LOGGER->recordData(logstring);
         }
         else
         {
             Memory* Replacement = getBestMemory(diff);
-            float newopt = CompareStates(diff, Replacement->Final - Replacement->Initial);
+            float newopt = compareStates(diff, Replacement->m_final - Replacement->m_initial);
 
             if (newopt > opt)
             {
-                Replacement->confidence += 10;
-                if (Replacement->confidence > 100)
-                    Replacement->confidence = 100;
+                Replacement->m_confidence += 10;
+                if (Replacement->m_confidence > 100)
+                    Replacement->m_confidence = 100;
 
-                ActiontoTake->confidence -= 10;
-                if (ActiontoTake->confidence < 0)
-                    ActiontoTake->confidence = 0;
+                ActiontoTake->m_confidence -= 10;
+                if (ActiontoTake->m_confidence < 0)
+                    ActiontoTake->m_confidence = 0;
 
                 logstring = "found better memory, adjusting";
-                DataLogger::recorddata(logstring);
+                DATA_LOGGER->recordData(logstring);
             }
             else if (newopt <= opt)
             {
-                ActiontoTake->Initial = Initial;
-                ActiontoTake->Final = Final;
-                ActiontoTake->confidence -= 10;
+                ActiontoTake->m_initial = Initial;
+                ActiontoTake->m_final = Final;
+                ActiontoTake->m_confidence -= 10;
 
-                if (ActiontoTake->confidence < 0)
-                    ActiontoTake->confidence = 0;
+                if (ActiontoTake->m_confidence < 0)
+                    ActiontoTake->m_confidence = 0;
 
                 logstring = "Adjusting memory";
-                DataLogger::recorddata(logstring);
+                DATA_LOGGER->recordData(logstring);
             }
         }
 
@@ -247,17 +247,17 @@ void AIEngine::ThreadRoutine()
 Memory* AIEngine::getBestMemory(State Target)
 {
     float maxoptimization = 0;
-    int seed = rand() % 100 / Memories.size();
-    vector<Memory>::iterator ReturnedMemory = Memories.begin();
+    int seed = rand() % 100 / m_memories.size();
+    vector<Memory>::iterator ReturnedMemory = m_memories.begin();
     for (int i = 0; i < seed - 1; i++)
         ReturnedMemory++;
 
-    for (vector<Memory>::iterator iter = Memories.begin(); iter != Memories.end(); iter++)
+    for (vector<Memory>::iterator iter = m_memories.begin(); iter != m_memories.end(); iter++)
     {
-        State diff = iter->Final - iter->Initial;
-        float opt = CompareStates(diff, Target);
+        State diff = iter->m_final - iter->m_initial;
+        float opt = compareStates(diff, Target);
 
-        if (opt > maxoptimization && iter->confidence >= ReturnedMemory->confidence)
+        if (opt > maxoptimization && iter->m_confidence >= ReturnedMemory->m_confidence)
         {
             maxoptimization = opt;
             ReturnedMemory = iter;
@@ -268,50 +268,50 @@ Memory* AIEngine::getBestMemory(State Target)
 }
 
 
-float AIEngine::CompareStates(State state1, State state2)
+float AIEngine::compareStates(State state1, State state2)
 {
-    float dotproduct = state1.Displacement.x * state2.Displacement.x + state1.Displacement.y * state2.Displacement.y
-            + state1.Displacement.z * state2.Displacement.z + state1.RPY.yaw * state2.RPY.yaw
-            + state1.RPY.pitch * state2.RPY.pitch + state1.RPY.roll * state2.RPY.roll;
+    float dotproduct = state1.m_displacement.x * state2.m_displacement.x + state1.m_displacement.y * state2.m_displacement.y
+            + state1.m_displacement.z * state2.m_displacement.z + state1.m_angPosition.yaw * state2.m_angPosition.yaw
+            + state1.m_angPosition.pitch * state2.m_angPosition.pitch + state1.m_angPosition.roll * state2.m_angPosition.roll;
 
     return dotproduct;
 }
 
 
-void AIEngine::ExecuteMemory(Memory mem)
+void AIEngine::executeMemory(Memory mem)
 {
     int base = 1;
-    for (vector<Motor>::iterator iter = Motors.begin(); iter != Motors.end(); iter++)
+    for (vector<Motor>::iterator iter = m_Motors.begin(); iter != m_Motors.end(); iter++)
     {
-        if (mem.MotorUsed & base)
+        if (mem.m_motorUsed & base)
         {
-            if (mem.direction & base)
-                iter->Forward();
+            if (mem.m_direction & base)
+                iter->forward();
             else
-                iter->Reverse();
+                iter->reverse();
 
-            iter->On();
+            iter->on();
         }
 
         base = base << 1;
     }
 
-    usleep(mem.deltaT * 1000000);
+    usleep(mem.m_timeElapsed_s * 1000000);
 
-    for (vector<Motor>::iterator iter = Motors.begin(); iter != Motors.end(); iter++)
-        iter->Off();
+    for (vector<Motor>::iterator iter = m_Motors.begin(); iter != m_Motors.end(); iter++)
+        iter->off();
 }
 
 
-string AIEngine::LogMemory(Memory mem)
+string AIEngine::logMemory(Memory mem)
 {
     string str = "";
 
-    State diff = mem.Final - mem.Initial;
+    State diff = mem.m_final - mem.m_initial;
 
-    str = str + mem.MotorUsed + " " + mem.direction + " " + mem.deltaT + " " + mem.confidence + " "
-            + diff.Displacement.x + " " + diff.Displacement.y + " " + diff.Displacement.z + " " + diff.RPY.roll + " "
-            + diff.RPY.pitch + " " + diff.RPY.yaw;
+    str = str + mem.m_motorUsed + " " + mem.m_direction + " " + mem.m_timeElapsed_s + " " + mem.m_confidence + " "
+            + diff.m_displacement.x + " " + diff.m_displacement.y + " " + diff.m_displacement.z + " " + diff.m_angPosition.roll + " "
+            + diff.m_angPosition.pitch + " " + diff.m_angPosition.yaw;
 
     return str;
 }

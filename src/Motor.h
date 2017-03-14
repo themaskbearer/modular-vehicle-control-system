@@ -12,18 +12,20 @@
 
 class Motor
 {
-private:
-    GPIO* direction;
-    GPIO* enable;
-
 public:
     Motor(int directionIO, int enableIO);
-    Motor(const Motor &Oldmotor);
+    Motor(const Motor &oldMotor);
     virtual ~Motor();
-    void On();
-    void Off();
-    void Forward();
-    void Reverse();
+
+    void on();
+    void off();
+    void forward();
+    void reverse();
+
+private:
+    GPIO* m_direction;
+    GPIO* m_enable;
+
 };
 
 #endif /* MOTOR_H_ */

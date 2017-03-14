@@ -12,31 +12,32 @@
 
 #include <string>
 #include <fstream>
-using std::ofstream;
-using std::string;
+
 
 
 class GPIO
 {
-private:
-    sem_t Access;
-    string location;
-    ofstream direction;
-    ofstream value;
-    bool Initialized;
-    bool is144;
-
-    void Initialize144();
-
 public:
     GPIO();
-    GPIO(const GPIO& Old); //This creates just an empty GPIO. Since these carry streams, they cannot be copied
+    GPIO(const GPIO& old);
     virtual ~GPIO();
-    void Initialize(string gpionumber);
+
+    void initialize(std::string gpioNumber);
+
     void makeInput();
     void makeOutput();
     void setState(int state);
     int readState(); //not implemented yet
+
+private:
+    sem_t m_access;
+    std::string m_location;
+    std::ofstream m_direction;
+    std::ofstream m_value;
+    bool m_initialized;
+    bool m_is144;
+
+    void initialize144();
 };
 
 #endif /* GPIO_H_ */

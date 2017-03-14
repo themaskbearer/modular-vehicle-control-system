@@ -24,24 +24,23 @@ SystemGPIOs::SystemGPIOs()
     GPIOS.insert(pair<int, GPIO>(MOTOR3DIR, GPIO()));
     GPIOS.insert(pair<int, GPIO>(MOTOR3EN, GPIO()));
 
-    GPIOS.find(MOTOR1DIR)->second.Initialize("144");
-    GPIOS.find(MOTOR1EN)->second.Initialize("174");
-    GPIOS.find(MOTOR2DIR)->second.Initialize("173");
-    GPIOS.find(MOTOR2EN)->second.Initialize("175");
-    GPIOS.find(MOTOR3DIR)->second.Initialize("147");
-    GPIOS.find(MOTOR3EN)->second.Initialize("172");
+    GPIOS.find(MOTOR1DIR)->second.initialize("144");
+    GPIOS.find(MOTOR1EN)->second.initialize("174");
+    GPIOS.find(MOTOR2DIR)->second.initialize("173");
+    GPIOS.find(MOTOR2EN)->second.initialize("175");
+    GPIOS.find(MOTOR3DIR)->second.initialize("147");
+    GPIOS.find(MOTOR3EN)->second.initialize("172");
 }
 
 
 SystemGPIOs::~SystemGPIOs()
 {
-    // TODO Auto-generated destructor stub
 }
 
 
-GPIO* SystemGPIOs::GetGPIO(int GPIONumber)
+GPIO* SystemGPIOs::getGPIO(int gpioNumber)
 {
-    map<int, GPIO>::iterator iter = GPIOS.find(GPIONumber);
+    map<int, GPIO>::iterator iter = GPIOS.find(gpioNumber);
 
     if(iter == GPIOS.end())
         return NULL;

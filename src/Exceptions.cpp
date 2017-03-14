@@ -7,32 +7,22 @@
 
 #include "Exceptions.h"
 
-Exception::Exception()
+
+Exception::Exception(std::string msg) :
+        m_message(msg),
+        m_errorValue(0)
 {
-    SetValues("", -1);
 }
 
 
-Exception::Exception(std::string Msg)
+Exception::Exception(std::string msg, int errorValue) :
+        m_message(msg),
+        m_errorValue(errorValue)
 {
-    SetValues(Msg, -1);
-}
-
-
-Exception::Exception(std::string Msg, int ErrorValue)
-{
-    SetValues(Msg, ErrorValue);
-}
-
-
-void Exception::SetValues(std::string Msg, int err)
-{
-    Message = Msg;
-    errorvalue = err;
 }
 
 
 Exception::~Exception()
 {
-    // TODO Auto-generated destructor stub
+
 }

@@ -24,7 +24,7 @@ public:
     SystemGPIOs();
     virtual ~SystemGPIOs();
 
-    static GPIO* GetGPIO(int GPIONumber);
+    static GPIO* getGPIO(int gpioNumber);
 };
 
 #endif /* SYSTEMGPIOS_H_ */

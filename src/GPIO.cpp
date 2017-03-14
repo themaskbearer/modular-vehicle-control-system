@@ -11,21 +11,21 @@
 
 GPIO::GPIO()
 {
-    Initialized = false;
-    is144 = false;
+    m_initialized = false;
+    m_is144 = false;
 
-    int error = sem_init(&Access, 0, 1);
+    int error = sem_init(&m_access, 0, 1);
     if(error == -1)
         throw Exception("Failed to create semaphore for GPIO");
 }
 
 
-GPIO::GPIO(const GPIO& Old)
+GPIO::GPIO(const GPIO& old)
 {
-    Initialized = false;
-    is144 = false;
+    m_initialized = false;
+    m_is144 = false;
 
-    int error = sem_init(&Access, 0, 1);
+    int error = sem_init(&m_access, 0, 1);
     if(error == -1)
         throw Exception("Failed to create semaphore for GPIO");
 }
@@ -33,120 +33,120 @@ GPIO::GPIO(const GPIO& Old)
 
 GPIO::~GPIO()
 {
-    if(value.is_open())
-        value.close();
+    if(m_value.is_open())
+        m_value.close();
 
-    if(direction.is_open())
-        direction.close();
+    if(m_direction.is_open())
+        m_direction.close();
 
-    sem_destroy(&Access);
+    sem_destroy(&m_access);
 }
 
 
-void GPIO::Initialize(string gpionumber)
+void GPIO::initialize(std::string gpioNumber)
 {
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        if(gpionumber == "144")
-            Initialize144();
+        if(gpioNumber == "144")
+            initialize144();
         else
         {
-            location = "/sys/class/gpio/gpio" + gpionumber;
-            value.open((location + "/value").c_str());
+            m_location = "/sys/class/gpio/gpio" + gpioNumber;
+            m_value.open((m_location + "/value").c_str());
 
-            direction.open((location + "/direction").c_str());
+            m_direction.open((m_location + "/direction").c_str());
 
-            if(!value.is_open())
-                ErrorHandler::recorderror(Exception("failed to open " + location + " value file"));
-            else if(!direction.is_open())
-                ErrorHandler::recorderror(Exception("failed to open " + location + " direction file"));
+            if(!m_value.is_open())
+                ERROR_HANDLER->recordError(Exception("failed to open " + m_location + " value file"));
+            else if(!m_direction.is_open())
+                ERROR_HANDLER->recordError(Exception("failed to open " + m_location + " direction file"));
             else
-                Initialized = true;
+                m_initialized = true;
         }
 
-        sem_post(&Access);
+        sem_post(&m_access);
     }
 }
 
 
-void GPIO::Initialize144()
+void GPIO::initialize144()
 {
-    is144 = true;
+    m_is144 = true;
 
-    location = "/sys/class/gpio/gpio";
-    location += "144";
-    value.open((location + "/value").c_str());
+    m_location = "/sys/class/gpio/gpio";
+    m_location += "144";
+    m_value.open((m_location + "/value").c_str());
 
-    if(!value.is_open())
-        ErrorHandler::recorderror(Exception("failed to open " + location + " value file"));
+    if(!m_value.is_open())
+        ERROR_HANDLER->recordError(Exception("failed to open " + m_location + " value file"));
     else
-        Initialized = true;
+        m_initialized = true;
 }
 
 
 void GPIO::makeInput()
 {
-    if(is144)
+    if(m_is144)
         return;
 
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        if(!Initialized)
-            throw Exception("Gpio " + location + " not intialized");
+        if(!m_initialized)
+            throw Exception("Gpio " + m_location + " not intialized");
 
-        string str = "echo in > ";
-        str += location;
+        std::string str = "echo in > ";
+        str += m_location;
         str += "/direction";
         system(str.c_str());
 
-        sem_post(&Access);
+        sem_post(&m_access);
     }
 }
 
 
 void GPIO::makeOutput()
 {
-    if(is144)
+    if(m_is144)
         return;
 
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        if(!Initialized)
-            throw Exception("Gpio " + location + " not intialized");
+        if(!m_initialized)
+            throw Exception("Gpio " + m_location + " not intialized");
 
-        string str = "echo out > ";
-        str += location;
+        std::string str = "echo out > ";
+        str += m_location;
         str += "/direction";
         system(str.c_str());
 
-        sem_post(&Access);
+        sem_post(&m_access);
     }
 }
 
 
 void GPIO::setState(int state)
 {
-    if(!sem_wait(&Access))
+    if(!sem_wait(&m_access))
     {
-        if(!Initialized)
-            throw Exception("Gpio " + location + " not intialized");
+        if(!m_initialized)
+            throw Exception("Gpio " + m_location + " not intialized");
 
         if(state == 0)
         {
-            string str = "echo 0 > ";
-            str += location;
+            std::string str = "echo 0 > ";
+            str += m_location;
             str += "/value";
             system(str.c_str());
         }
         else
         {
-            string str = "echo 1 > ";
-            str += location;
+            std::string str = "echo 1 > ";
+            str += m_location;
             str += "/value";
             system(str.c_str());
         }
 
-        sem_post(&Access);
+        sem_post(&m_access);
     }
 }
 

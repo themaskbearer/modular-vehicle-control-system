@@ -13,17 +13,17 @@
 
 class Thread
 {
-private:
-	pthread_t thread;
-
-	static void *ThreadLauncher(void *arg);
-	virtual void ThreadRoutine();
-
 public:
-	Thread();
-	virtual ~Thread();
+    Thread();
+    virtual ~Thread();
 
-	void StartThread();
+    void startThread();
+
+private:
+    pthread_t m_thread;
+
+    static void *threadLauncher(void *arg);
+    virtual void threadRoutine() =0;
 };
 
 #endif /* THREAD_H_ */

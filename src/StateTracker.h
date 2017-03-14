@@ -39,30 +39,30 @@ using std::vector;
 
 class StateTracker: public Thread
 {
-private:
-    i2cHandler sensors;
-    State CurrentState;
-    State LastState;
-    vector<float> R;
-    int AccelCounter[3];
-    float BiasFilter[3];
-
-    sem_t Access;
-
-    void ThreadRoutine();
-    void initializeOrientation();
-
-    vector<float> CreateRotationMatrix(float a, float b, float g);
-    vector<float> MultiplyRMatrix(vector<float> R, vector<float> Rb);
-    vector<float> MultiplyPosition(vector<float> R, vector<float> p);
-
-    void updateState(sensordata data);
-
 public:
     StateTracker();
     virtual ~StateTracker();
 
     State getCurrentState();
+
+private:
+    I2cHandler m_sensors;
+    State m_currentState;
+    State m_lastState;
+    vector<float> m_R;
+    int m_accelCounter[3];
+    float m_biasFilter[3];
+
+    sem_t m_access;
+
+    void threadRoutine();
+    void initializeOrientation();
+
+    vector<float> createRotationMatrix(float a, float b, float g);
+    vector<float> multiplyRMatrix(vector<float> R, vector<float> Rb);
+    vector<float> multiplyPosition(vector<float> R, vector<float> p);
+
+    void updateState(SensorData data);
 };
 
 #endif /* STATETRACKER_H_ */

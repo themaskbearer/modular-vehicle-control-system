@@ -4,7 +4,7 @@
 
 #include "Memory.h"
 
-#include <vector>;
+#include <vector>
 using std::vector;
 using std::iterator;
 

@@ -14,17 +14,17 @@
 
 class Exception
 {
-private:
-    void SetValues(std::string Msg, int err);
-
 public:
-    Exception();
-    Exception(std::string Msg);
-    Exception(std::string Msg, int ErrorValue);
+    Exception(std::string msg);
+    Exception(std::string msg, int errorValue);
     virtual ~Exception();
 
-    std::string Message;
-    int errorvalue;
+    const std::string& getMessage() const { return m_message; }
+    int getErrorValue() const { return m_errorValue; }
+
+private:
+    std::string m_message;
+    int m_errorValue;
 };
 
 #endif /* EXCEPTION_H_ */
