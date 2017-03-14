@@ -9,20 +9,31 @@
 #define AIENGINE_H_
 
 #include "Thread.h"
+#include "PathPlanner.h"
+#include "StateTracker.h"
+#include "Motor.h"
 
 #define CONFIDENCE_LEVEL 50
 
 class AIEngine: public Thread
 {
-private:
+        private:
+                PathPlanner Navigator;
+                StateTracker IMU;
+                double Confidence;
+                vector<Memory> Memories;
+                vector<Motor> Motors;
+        
+                void ThreadRoutine();
+                Memory* getBestMemory(State Target);
+                void ExecuteMemory(Memory mem);
+        
+                float CompareStates(State state1, State state2);
+                string LogMemory(Memory mem);
 
-	void ThreadRoutine();
-	double Confidence;
-
-public:
-	AIEngine();
-	virtual ~AIEngine();
-
+        public:
+                AIEngine();
+                virtual ~AIEngine();
 };
 
 #endif /* AIENGINE_H_ */

@@ -12,6 +12,6 @@
 using std::string;
 
 string operator+(string str, int i);
-
+string operator+(string str, float f);
 
 #endif /* OPERATORFUNCTIONS_H_ */

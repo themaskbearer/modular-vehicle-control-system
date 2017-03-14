@@ -11,15 +11,15 @@ using std::iterator;
 class PathPlanner
 {
 private:
-	vector<State> Locations;
-	iterator<vector<State>> CurrentTarget;
+    vector<State> Locations;
+    vector<State>::iterator CurrentTarget;
 
 public:
-	PathPlanner(void);
-	~PathPlanner(void);
+    PathPlanner(void);
+    ~PathPlanner(void);
 
-	State GetTarget();
-	void UpdateTarget(State CurrentState);
+    State GetTarget();
+    void UpdateTarget(State CurrentState);
 };
 
 #endif //PATHPLANNER

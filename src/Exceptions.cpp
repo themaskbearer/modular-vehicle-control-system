@@ -9,22 +9,30 @@
 
 Exception::Exception()
 {
-	Exception("");
+    SetValues("", -1);
 }
+
 
 Exception::Exception(std::string Msg)
 {
-	Exception(Msg, -1);
+    SetValues(Msg, -1);
 }
+
 
 Exception::Exception(std::string Msg, int ErrorValue)
 {
-	Message = Msg;
-	errorvalue = ErrorValue;
+    SetValues(Msg, ErrorValue);
 }
+
+
+void Exception::SetValues(std::string Msg, int err)
+{
+    Message = Msg;
+    errorvalue = err;
+}
+
 
 Exception::~Exception()
 {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
-

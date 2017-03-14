@@ -24,22 +24,30 @@ using std::ofstream;
 class DataLogger : public Thread
 {
 private:
-	static sem_t Access;
-	ofstream datafile;
-	static queue<string> datalist;
+    static sem_t Access;
+    ofstream datafile;
+    ofstream accelfile;
+    ofstream sensefile;
+    static queue<string> datalist;
+    static queue<string> accellist;
+    static queue<string> senselist;
 
-	void InitializeMembers(string FilePath);
-	void WriteQueuetoFile();
-	std::ostream& writeStringtoStream(std::ostream& streamtowrite, string str);
+    void InitializeMembers(string FilePath);
+    void WriteQueuetoFile();
+    void WriteAcceltoFile();
+    void WriteSensetoFile();
+    std::ostream& writeStringtoStream(std::ostream& streamtowrite, string str);
 
-	void ThreadRoutine();
+    void ThreadRoutine();
 
 public:
-	DataLogger();
-	DataLogger(string FilePath);
-	virtual ~DataLogger();
+    DataLogger();
+    DataLogger(string FilePath);
+    virtual ~DataLogger();
 
-	static void recorddata(string Data);
+    static void recorddata(string Data);
+    static void recordaccel(string data);
+    static void recordsense(string data);
 };
 
 #endif /* DATALOGGER_H_ */

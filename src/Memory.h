@@ -14,27 +14,26 @@ using std::ostream;
 
 struct axesprojection
 {
-	float x;
-	float y;
-	float z;
+    float x;
+    float y;
+    float z;
 };
 
 struct rotprojection
 {
-	float roll;
-	float pitch;
-	float heading;
+    float roll;
+    float pitch;
+    float yaw;
 };
 
 struct State
 {
-	axesprojection Displacement;
-	axesprojection Velocity;
-	axesprojection Acceleration;
-
-	rotprojection HPR;
-	rotprojection AngVelocity;
-	rotprojection AngAcceleration;
+    axesprojection Displacement;
+    axesprojection Velocity;
+    axesprojection Acceleration;
+    rotprojection RPY;
+    rotprojection AngVelocity;
+    rotprojection AngAcceleration;
 };
 
 State getEmptyState();
@@ -42,14 +41,17 @@ State getEmptyState();
 class Memory
 {
 public:
-	State Initial;
-	State Final;
+    State Initial;
+    State Final;
 
-	int MotorUsed;
-	float deltaT;
+    int MotorUsed;
+    int direction;
+    float deltaT;
 
-	Memory();
-	virtual ~Memory();
+    float confidence;
+
+    Memory();
+    virtual ~Memory();
 };
 
 istream &operator>>(istream &strm, Memory mem);

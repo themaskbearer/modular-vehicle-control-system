@@ -6,34 +6,47 @@
  */
 
 #include "Motor.h"
+#include "SystemGPIOs.h"
 
-Motor::Motor(string directionIO, string enableIO)
+
+Motor::Motor(int directionIO, int enableIO)
 {
-	direction.Initialize(directionIO);
-	enable.Initialize(enableIO);
+    direction = SystemGPIOs::GetGPIO(directionIO);
+    enable = SystemGPIOs::GetGPIO(enableIO);
 }
+
+
+Motor::Motor(const Motor &Oldmotor)
+{
+    direction = Oldmotor.direction;
+    enable = Oldmotor.enable;
+}
+
 
 Motor::~Motor()
 {
-
 }
+
 
 void Motor::On()
 {
-	enable.setState(1);
+    enable->setState(1);
 }
+
 
 void Motor::Off()
 {
-	enable.setState(0);
+    enable->setState(0);
 }
+
 
 void Motor::Forward()
 {
-	direction.setState(1);
+    direction->setState(1);
 }
+
 
 void Motor::Reverse()
 {
-	direction.setState(0);
+    direction->setState(0);
 }

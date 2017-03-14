@@ -17,8 +17,8 @@
 
 #include "i2cHandler.h"
 #include "I2Caddresses.h"
-#include "Exceptions.h"
 #include "ErrorHandler.h"
+#include "Exceptions.h"
 
 i2cHandler::i2cHandler()
 {

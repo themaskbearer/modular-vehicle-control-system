@@ -14,14 +14,17 @@
 
 class Exception
 {
-public:
-	Exception();
-	Exception(std::string Msg);
-	Exception(std::string Msg, int ErrorValue);
-	virtual ~Exception();
+private:
+    void SetValues(std::string Msg, int err);
 
-	std::string Message;
-	int errorvalue;
+public:
+    Exception();
+    Exception(std::string Msg);
+    Exception(std::string Msg, int ErrorValue);
+    virtual ~Exception();
+
+    std::string Message;
+    int errorvalue;
 };
 
 #endif /* EXCEPTION_H_ */

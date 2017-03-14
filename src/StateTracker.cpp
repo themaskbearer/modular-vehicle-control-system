@@ -6,161 +6,239 @@
  */
 
 #include "StateTracker.h"
+#define _USE_MATH_DEFINES
 #include <cmath>
 
-#define _USE_MATH_DEFINES
-using std::tan;
+using std::sqrt;
 using std::atan2;
+using std::asin;
+using std::cos;
+using std::sin;
+using std::tan;
 using std::pow;
+
 
 StateTracker::StateTracker()
 {
-	Gmag = 0;
-	CurrentState = LastState = getEmptyState();
+    CurrentState = LastState = getEmptyState();
 
-	IntegratedAccelX = 0;
-	accelerating = false;
-	decelerating = false;
+    R.push_back(1);
+    R.push_back(0);
+    R.push_back(0);
 
-	LastData.Gyro.X = 0;
-	LastData.Gyro.Y = 0;
-	LastData.Gyro.Z = 0;
+    R.push_back(0);
+    R.push_back(1);
+    R.push_back(0);
 
-	LastData.Accelerometer.X = 0;
-	LastData.Accelerometer.Y = 0;
-	LastData.Accelerometer.Z = 0;
+    R.push_back(0);
+    R.push_back(0);
+    R.push_back(1);
+
+    for(int i = 0; i < 3; i++)
+    {
+        AccelCounter[i] = 0;
+        BiasFilter[i] = 0;
+    }
+
+    int error = sem_init(&Access, 0, 1);
+    if(error == -1)
+        throw Exception("Failed to create semaphore for StateTracker");
 }
+
 
 StateTracker::~StateTracker()
 {
-
+    sem_destroy(&Access);
 }
+
 
 void StateTracker::ThreadRoutine()
 {
-	initializeOrientation();
+    initializeOrientation();
 
-	while(true)
-	{
-		sensordata readings = sensors.getSensorData();
-		updateState(readings);
+    while(true)
+    {
+        sensordata readings = sensors.getSensorData();
+        updateState(readings);
 
-		usleep(10000);
-	}
+        usleep(7100);
+    }
 }
+
 
 void StateTracker::initializeOrientation()
 {
+    sensordata Initial = sensors.getSensorData();
 
-	for(int i = 0; i < GRAVITY_SAMPLES; i++)
-	{
-		sensordata initialreading = sensors.getSensorData();
+    float g = atan2((float)Initial.Accelerometer.Y, (float)Initial.Accelerometer.Z);
+    float b = asin(-(float)Initial.Accelerometer.X/GMAG);
+    float a = 0;
 
-		float x = initialreading.Accelerometer.X;
-		float y = initialreading.Accelerometer.Y;
-		float z = initialreading.Accelerometer.Z;
+    vector<float> temp = CreateRotationMatrix(a, b, g);
+    R = MultiplyRMatrix(R, temp);
 
-		Gmag += std::sqrt(x*x + y*y +z*z);
+//    CurrentState.RPY.pitch = g;
+//    CurrentState.RPY.roll = b;
+//    if(!sem_wait(&Access))
+//    {
+//        LastState = CurrentState;
+//        sem_post(&Access);
+//    }
 
-		CurrentState.HPR.heading += atan2(y, x);
-		CurrentState.HPR.roll += atan2(z, y);
-		CurrentState.HPR.pitch += atan2(z, x);
-	}
-
-	Gmag /= GRAVITY_SAMPLES;
-	CurrentState.HPR.heading /= GRAVITY_SAMPLES;
-	CurrentState.HPR.roll /= GRAVITY_SAMPLES;
-	CurrentState.HPR.pitch /= GRAVITY_SAMPLES;
-
-	//Add functionality to gain initial rotation speeds as well
+    //Add functionality to gain initial rotation speeds as well
 }
+
 
 void StateTracker::updateState(sensordata data)
 {
-	LastState = CurrentState;
+    CurrentState.AngVelocity.roll = (data.Gyro.Y - GYROY_BIAS)*GYRO_SCALE_FCTR*RADIANS;
+    CurrentState.AngVelocity.pitch = (data.Gyro.X - GYROX_BIAS)*GYRO_SCALE_FCTR*RADIANS;
+    CurrentState.AngVelocity.yaw = (data.Gyro.Z - GYROZ_BIAS)*GYRO_SCALE_FCTR*RADIANS;
 
-	filterGyro(data);
-	updateOrientation(data);
-	filterAccel(data);
-	updatePosition(data);
+    float a = CurrentState.AngVelocity.yaw*DELTA_T;
+    float b = CurrentState.AngVelocity.roll*DELTA_T;
+    float g = CurrentState.AngVelocity.pitch*DELTA_T;
 
-	LastData = data;
+    vector<float> temp = CreateRotationMatrix(a, b, g);
+    R = MultiplyRMatrix(R, temp);
+
+    float xg = R[6]*GMAG;
+    float yg = R[7]*GMAG;
+    float zg = R[8]*GMAG;
+
+    CurrentState.Acceleration.x = data.Accelerometer.X - xg;
+    CurrentState.Acceleration.y = data.Accelerometer.Y - yg;
+    CurrentState.Acceleration.z = data.Accelerometer.Z - zg;
+
+    vector<float> p(3, 0);
+
+    p[0] = CurrentState.Acceleration.x;
+    p[1] = CurrentState.Acceleration.y;
+    p[2] = CurrentState.Acceleration.z;
+
+    p = MultiplyPosition(R, p);
+
+    CurrentState.Acceleration.x = p[0];
+    CurrentState.Acceleration.y = p[1];
+    CurrentState.Acceleration.z = p[2];
+
+    CurrentState.RPY.roll = atan2(-R[6], sqrt(pow(R[0],2) + pow(R[3],2)));
+    CurrentState.RPY.yaw = atan2(R[3]/cos(CurrentState.RPY.roll), R[0]/cos(CurrentState.RPY.roll));
+    CurrentState.RPY.pitch = atan2(R[7]/cos(CurrentState.RPY.roll), R[8]/cos(CurrentState.RPY.roll));
+
+    float *accel, *vel, *pos;
+
+    accel = &CurrentState.Acceleration.x;
+    vel = &CurrentState.Velocity.x;
+    pos = &CurrentState.Displacement.x;
+
+    float *lastaccel, *lastvel, *lastpos;
+
+    lastaccel = &LastState.Acceleration.x;
+    lastvel = &LastState.Velocity.x;
+    lastpos = &LastState.Displacement.x;
+
+    //Begin Acceleration processing
+
+    for(int i = 0; i < 3; i++)
+    {
+        *accel = (*accel)*ACCEL_SCALE_FCTR*G_CONVERSION;
+        *accel = *lastaccel + (*accel - *lastaccel)*ALPHA;
+
+        BiasFilter[i] = BiasFilter[i] + (*accel - BiasFilter[i])*HEAVY_ALPHA;
+        *accel = *accel - BiasFilter[i];
+
+        if((*accel - *lastaccel) < 0.05 )
+        {
+            AccelCounter[i]++;
+        }
+        else
+        {
+            AccelCounter[i] = 0;
+        }
+
+        float adjaccel = *accel;
+
+        if(AccelCounter[i] >= 33)
+        {
+            float error = (-(*lastvel));
+            adjaccel = error*P;
+        }
+
+        *vel = *lastvel + adjaccel*DELTA_T;
+        *pos = *lastpos + (*vel)*DELTA_T;
+
+        accel++;
+        vel++;
+        pos++;
+
+        lastaccel++;
+        lastvel++;
+        lastpos++;
+    }
+
+    if(!sem_wait(&Access))
+    {
+        LastState = CurrentState;
+        sem_post(&Access);
+    }
 }
 
-void StateTracker::filterGyro(sensordata& data)
+
+vector<float> StateTracker::CreateRotationMatrix(float a, float b, float g)
 {
-	data.Gyro.X -= GYRO_X_BIAS;
-	data.Gyro.Y -= GYRO_Y_BIAS;
-	data.Gyro.Z -= GYRO_Z_BIAS;
+    vector<float> R;
 
-	data.Gyro.X = LastData.Gyro.X + ALPHA*(data.Gyro.X - LastData.Gyro.X);
-	data.Gyro.Y = LastData.Gyro.Y + ALPHA*(data.Gyro.Y - LastData.Gyro.Y);
-	data.Gyro.Z = LastData.Gyro.Z + ALPHA*(data.Gyro.Z - LastData.Gyro.Z);
+    R.push_back(cos(a)*cos(b));
+    R.push_back(cos(a)*sin(b)*sin(g) - sin(a)*cos(g));
+    R.push_back(cos(a)*sin(b)*cos(g) + sin(a)*sin(g));
+
+    R.push_back(sin(a)*cos(b));
+    R.push_back(sin(a)*sin(b)*sin(g) + cos(a)*cos(g));
+    R.push_back(sin(a)*sin(b)*cos(g) - cos(a)*sin(g));
+
+    R.push_back(-sin(b));
+    R.push_back(cos(b)*sin(g));
+    R.push_back(cos(b)*cos(g));
+
+    return R;
 }
 
-void StateTracker::updateOrientation(sensordata data)
+
+vector<float> StateTracker::MultiplyRMatrix(vector<float> R, vector<float> Rb)
 {
-	CurrentState.HPR.roll = LastState.HPR.roll + data.Gyro.X*.01*GYRO_SCALE_FCTR*RADIANS;
-	CurrentState.HPR.pitch = LastState.HPR.pitch + data.Gyro.Y*.01*GYRO_SCALE_FCTR*RADIANS;
-	CurrentState.HPR.heading = LastState.HPR.heading + data.Gyro.Z*.01*GYRO_SCALE_FCTR*RADIANS;
+    vector<float> ReturnedMatrix(9, 0);
+
+    for(int i = 0; i < 3; i++)
+        for(int j = 0; j < 3; j++)
+            for(int k = 0; k < 3; k++)
+                ReturnedMatrix[i*3 + j] += R[i*3 + k] * Rb[j + k*3];
+
+    return ReturnedMatrix;
 }
 
-void StateTracker::filterAccel(sensordata& data)
+
+vector<float> StateTracker::MultiplyPosition(vector<float> R, vector<float> p)
 {
-	removeGravity(data);
+    vector<float> ReturnedMatrix(3, 0);
 
-	data.Accelerometer.X = LastData.Accelerometer.X + ALPHA*(data.Accelerometer.X - LastData.Accelerometer.X);
-	data.Accelerometer.Y = LastData.Accelerometer.Y + ALPHA*(data.Accelerometer.Y - LastData.Accelerometer.Y);
-	data.Accelerometer.Z = LastData.Accelerometer.Z + ALPHA*(data.Accelerometer.Z - LastData.Accelerometer.Z);
+    for(int i = 0; i < 3; i++)
+        for(int j = 0; j < 3; j++)
+            ReturnedMatrix[i] += R[i*3 + j] * p[j];
+
+    return ReturnedMatrix;
 }
 
-void StateTracker::removeGravity(sensordata& data)
-{
-	float Xg = sqrt(Gmag*Gmag/(1 + pow(tan(CurrentState.HPR.heading), 2) + pow(tan(CurrentState.HPR.pitch), 2)));
-	float Yg = Xg*tan(CurrentState.HPR.heading);
-	float Zg = Xg*tan(CurrentState.HPR.pitch);
-
-	data.Accelerometer.X -= Xg;
-	data.Accelerometer.Y -= Yg;
-	data.Accelerometer.Z -= Zg;
-}
-
-void StateTracker::updatePosition(sensordata data)
-{
-	CurrentState.Acceleration.x = data.Accelerometer.X*ACCEL_SCALE_FCTR;
-	CurrentState.Velocity.x = LastState.Velocity.x + CurrentState.Acceleration.x * .01*ACCEL_SCALE_FCTR;
-	CurrentState.Displacement.x = LastState.Displacement.x + CurrentState.Velocity.x * .01*ACCEL_SCALE_FCTR;
-
-	MovementApproximator(data);
-}
-
-void StateTracker::MovementApproximator(sensordata data)
-{
-	IntegratedAccelX += data.Accelerometer.X;
-
-	string msg = "Integrated Accel: ";
-	msg = msg + IntegratedAccelX;
-	DataLogger::recorddata(msg);
-
-	if(data.Accelerometer.X > 0)
-		accelerating = true;
-	else if(data.Accelerometer.X < 0)
-		decelerating = true;
-
-	if(accelerating && decelerating && std::abs((float) IntegratedAccelX) < INTEGRATION_ERROR)
-	{
-		CurrentState.Velocity.x = 0;
-		IntegratedAccelX = 0;
-
-		accelerating = false;
-		decelerating = false;
-
-		msg = "return to zero speed!";
-		DataLogger::recorddata(msg);
-	}
-}
 
 State StateTracker::getCurrentState()
 {
-	return CurrentState;
+    State ReturnedState = getEmptyState();
+
+    if(!sem_wait(&Access))
+    {
+        ReturnedState = LastState;
+        sem_post(&Access);
+    }
+
+    return ReturnedState;
 }

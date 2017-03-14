@@ -12,26 +12,21 @@ using std::endl;
 
 int main()
 {
-	cout << "starting error handler...\n";
-	ErrorHandler handler;
-	handler.StartThread();
+        ErrorHandler handler;
+        handler.StartThread();
 
-	cout << "starting data logger...\n";
-	DataLogger logger;
-	logger.StartThread();
+        DataLogger logger;
+        logger.StartThread();
 
-	cout << "starting state tracker...\n";
-	StateTracker tracker;
-	tracker.StartThread();
+        usleep(300000000); //5 mins
 
-	while(true)
-	{
-		State data = tracker.getCurrentState();
+        SystemGPIOs IOs;
 
-		cout << "Current Distance: " << data.Displacement.x << endl;
+        AIEngine Controller;
+        Controller.StartThread();
 
-		usleep(500000);
-	}
-
-	return 0;
+        while(1)
+                usleep(1000000);        
+        
+        return 0;
 }

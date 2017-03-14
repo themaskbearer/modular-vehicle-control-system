@@ -8,59 +8,61 @@
 #ifndef STATETRACKER_H_
 #define STATETRACKER_H_
 
+#include "semaphore.h"
+
+#include <vector>
+using std::vector;
+
 #include "Thread.h"
 #include "i2cHandler.h"
 #include "Memory.h"
 #include "DataLogger.h"
 
-#define GRAVITY_SAMPLES 50
+#define ACCEL_SCALE_FCTR        4
+#define G_CONVERSION            9.81/1000
 
-#define ALPHA 0.1
+#define GYRO_SCALE_FCTR         0.069565217
+#define GYROX_BIAS              -87.6620
+#define GYROY_BIAS              18.2860
+#define GYROZ_BIAS              -5.3140
 
-#define ACCEL_SCALE_FCTR 4
-#define ACCEL_NOISE 3
+#define GMAG                    236.33
 
-#define GYRO_SCALE_FCTR 0.069565217
-#define GYRO_X_BIAS 87.5
-#define GYRO_Y_BIAS 21.5
-#define GYRO_Z_BIAS 12
-#define GYRO_NOISE 3
+#define ALPHA                   0.05
+#define HEAVY_ALPHA             0.001
+#define P                       100
 
 #define RADIANS M_PI/180
 
-#define INTEGRATION_ERROR 15
-
+#define DELTA_T 0.01
 
 
 class StateTracker: public Thread
 {
 private:
-	i2cHandler sensors;
-	State CurrentState;
-	State LastState;
-	sensordata LastData;
+    i2cHandler sensors;
+    State CurrentState;
+    State LastState;
+    vector<float> R;
+    int AccelCounter[3];
+    float BiasFilter[3];
 
-	float Gmag;
+    sem_t Access;
 
-	int IntegratedAccelX;
-	bool accelerating;
-	bool decelerating;
+    void ThreadRoutine();
+    void initializeOrientation();
 
-	void ThreadRoutine();
-	void initializeOrientation();
-	void filterGyro(sensordata& data);
-	void updateOrientation(sensordata data);
-	void filterAccel(sensordata& data);
-	void removeGravity(sensordata& data);
-	void updatePosition(sensordata data);
-	void MovementApproximator(sensordata data);
-	void updateState(sensordata data);
+    vector<float> CreateRotationMatrix(float a, float b, float g);
+    vector<float> MultiplyRMatrix(vector<float> R, vector<float> Rb);
+    vector<float> MultiplyPosition(vector<float> R, vector<float> p);
+
+    void updateState(sensordata data);
 
 public:
-	StateTracker();
-	virtual ~StateTracker();
+    StateTracker();
+    virtual ~StateTracker();
 
-	State getCurrentState();
+    State getCurrentState();
 };
 
 #endif /* STATETRACKER_H_ */
