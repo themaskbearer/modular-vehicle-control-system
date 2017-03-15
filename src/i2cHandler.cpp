@@ -18,8 +18,8 @@
 #include <algorithm>
 
 #include "I2Caddresses.h"
-#include "ErrorHandler.h"
-#include "Exceptions.h"
+#include "utils/ErrorHandler.h"
+#include "utils/Exceptions.h"
 
 I2cHandler::I2cHandler()
 {

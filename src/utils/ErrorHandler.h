@@ -8,14 +8,13 @@
 #ifndef ERRORHANDLER_H_
 #define ERRORHANDLER_H_
 
-#include <semaphore.h>
-
 #include <fstream>
 #include <string>
 #include <queue>
 
 #include "Exceptions.h"
-#include "Thread.h"
+#include "thread/Thread.h"
+#include "thread/Mutex.h"
 
 
 class ErrorHandler : public Thread
@@ -36,9 +35,9 @@ private:
 
     bool m_initialized = false;
 
-    sem_t m_access;
+    Mutex m_access;
     std::ofstream m_errorfile;
-    std::queue<Exception> m_errorlist;
+    std::vector<Exception> m_errorlist;
 
     void threadRoutine();
 

@@ -8,15 +8,12 @@
 #ifndef STATETRACKER_H_
 #define STATETRACKER_H_
 
-#include "semaphore.h"
-
 #include <vector>
-using std::vector;
 
-#include "Thread.h"
+#include "thread/Thread.h"
 #include "i2cHandler.h"
 #include "Memory.h"
-#include "DataLogger.h"
+#include "utils/DataLogger.h"
 
 #define ACCEL_SCALE_FCTR        4
 #define G_CONVERSION            9.81/1000
@@ -49,18 +46,18 @@ private:
     I2cHandler m_sensors;
     State m_currentState;
     State m_lastState;
-    vector<float> m_R;
+    std::vector<float> m_R;
     int m_accelCounter[3];
     float m_biasFilter[3];
 
-    sem_t m_access;
+    Mutex m_access;
 
     void threadRoutine();
     void initializeOrientation();
 
-    vector<float> createRotationMatrix(float a, float b, float g);
-    vector<float> multiplyRMatrix(vector<float> R, vector<float> Rb);
-    vector<float> multiplyPosition(vector<float> R, vector<float> p);
+    std::vector<float> createRotationMatrix(float a, float b, float g);
+    std::vector<float> multiplyRMatrix(std::vector<float> R, std::vector<float> Rb);
+    std::vector<float> multiplyPosition(std::vector<float> R, std::vector<float> p);
 
     void updateState(SensorData data);
 };

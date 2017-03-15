@@ -17,14 +17,14 @@ using std::pair;
 
 class SystemGPIOs
 {
-private:
-    static map<int, GPIO> GPIOS;
-
 public:
     SystemGPIOs();
     virtual ~SystemGPIOs();
 
     static GPIO* getGPIO(int gpioNumber);
+
+private:
+    static map<int, GPIO> GPIOS;
 };
 
 #endif /* SYSTEMGPIOS_H_ */

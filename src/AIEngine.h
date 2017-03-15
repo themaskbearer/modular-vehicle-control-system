@@ -8,7 +8,7 @@
 #ifndef AIENGINE_H_
 #define AIENGINE_H_
 
-#include "Thread.h"
+#include "thread/Thread.h"
 #include "PathPlanner.h"
 #include "StateTracker.h"
 #include "Motor.h"
@@ -24,16 +24,22 @@ public:
 private:
     PathPlanner m_navigator;
     StateTracker m_imu;
-    double m_confidence;
+    double m_confidence = 0;
     vector<Memory> m_memories;
     vector<Motor> m_Motors;
 
     void threadRoutine();
-    Memory* getBestMemory(State Target);
-    void executeMemory(Memory mem);
 
-    float compareStates(State state1, State state2);
-    string logMemory(Memory mem);
+    void learnConfiguration();
+    void followTargets();
+
+    Memory* getBestMemory(const State& Target);
+    void executeMemory(const Memory& mem);
+
+    float compareStates(const State& state1, const State& state2);
+
+    void logMemory(const std::string& title, const Memory& mem);
+    void logState(const std::string& title, const State& state);
 };
 
 #endif /* AIENGINE_H_ */

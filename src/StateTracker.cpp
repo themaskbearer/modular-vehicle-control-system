@@ -6,6 +6,9 @@
  */
 
 #include "StateTracker.h"
+#include "utils/ErrorHandler.h"
+#include "thread/LockGuard.h"
+
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -37,16 +40,11 @@ StateTracker::StateTracker()
         m_accelCounter[i] = 0;
         m_biasFilter[i] = 0;
     }
-
-    int error = sem_init(&m_access, 0, 1);
-    if(error == -1)
-        throw Exception("Failed to create semaphore for StateTracker");
 }
 
 
 StateTracker::~StateTracker()
 {
-    sem_destroy(&m_access);
 }
 
 
@@ -72,7 +70,7 @@ void StateTracker::initializeOrientation()
     float b = asin(-(float)Initial.Accelerometer.X/GMAG);
     float a = 0;
 
-    vector<float> temp = createRotationMatrix(a, b, g);
+    std::vector<float> temp = createRotationMatrix(a, b, g);
     m_R = multiplyRMatrix(m_R, temp);
 
 //    CurrentState.RPY.pitch = g;
@@ -97,7 +95,7 @@ void StateTracker::updateState(SensorData data)
     float b = m_currentState.m_angVelocity.roll*DELTA_T;
     float g = m_currentState.m_angVelocity.pitch*DELTA_T;
 
-    vector<float> temp = createRotationMatrix(a, b, g);
+    std::vector<float> temp = createRotationMatrix(a, b, g);
     m_R = multiplyRMatrix(m_R, temp);
 
     float xg = m_R[6]*GMAG;
@@ -108,7 +106,7 @@ void StateTracker::updateState(SensorData data)
     m_currentState.m_acceleration.y = data.Accelerometer.Y - yg;
     m_currentState.m_acceleration.z = data.Accelerometer.Z - zg;
 
-    vector<float> p(3, 0);
+    std::vector<float> p(3, 0);
 
     p[0] = m_currentState.m_acceleration.x;
     p[1] = m_currentState.m_acceleration.y;
@@ -175,17 +173,17 @@ void StateTracker::updateState(SensorData data)
         lastpos++;
     }
 
-    if(!sem_wait(&m_access))
+
     {
+        LockGuard guard(m_access);
         m_lastState = m_currentState;
-        sem_post(&m_access);
     }
 }
 
 
-vector<float> StateTracker::createRotationMatrix(float a, float b, float g)
+std::vector<float> StateTracker::createRotationMatrix(float a, float b, float g)
 {
-    vector<float> R;
+    std::vector<float> R;
 
     R.push_back(cos(a)*cos(b));
     R.push_back(cos(a)*sin(b)*sin(g) - sin(a)*cos(g));
@@ -203,9 +201,9 @@ vector<float> StateTracker::createRotationMatrix(float a, float b, float g)
 }
 
 
-vector<float> StateTracker::multiplyRMatrix(vector<float> R, vector<float> Rb)
+std::vector<float> StateTracker::multiplyRMatrix(std::vector<float> R, std::vector<float> Rb)
 {
-    vector<float> ReturnedMatrix(9, 0);
+    std::vector<float> ReturnedMatrix(9, 0);
 
     for(int i = 0; i < 3; i++)
         for(int j = 0; j < 3; j++)
@@ -216,9 +214,9 @@ vector<float> StateTracker::multiplyRMatrix(vector<float> R, vector<float> Rb)
 }
 
 
-vector<float> StateTracker::multiplyPosition(vector<float> R, vector<float> p)
+std::vector<float> StateTracker::multiplyPosition(std::vector<float> R, std::vector<float> p)
 {
-    vector<float> ReturnedMatrix(3, 0);
+    std::vector<float> ReturnedMatrix(3, 0);
 
     for(int i = 0; i < 3; i++)
         for(int j = 0; j < 3; j++)
@@ -230,13 +228,7 @@ vector<float> StateTracker::multiplyPosition(vector<float> R, vector<float> p)
 
 State StateTracker::getCurrentState()
 {
-    State ReturnedState;
+    LockGuard guard(m_access);
 
-    if(!sem_wait(&m_access))
-    {
-        ReturnedState = m_lastState;
-        sem_post(&m_access);
-    }
-
-    return ReturnedState;
+    return m_lastState;
 }

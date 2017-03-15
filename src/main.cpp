@@ -5,11 +5,9 @@
 
 #include "AIEngine.h"
 #include "SystemGPIOs.h"
-#include "ErrorHandler.h"
-#include "DataLogger.h"
+#include "utils/ErrorHandler.h"
+#include "utils/DataLogger.h"
 
-using std::cout;
-using std::endl;
 
 int main()
 {
@@ -19,7 +17,7 @@ int main()
         DATA_LOGGER->initialize();
         DATA_LOGGER->startThread();
 
-        usleep(300000000); //5 mins
+        usleep(300000000); // 5 mins
 
         SystemGPIOs IOs;
 
@@ -27,7 +25,10 @@ int main()
         Controller.startThread();
 
         while(1)
-                usleep(1000000);
+                usleep(1000000);    // 1 sec
+
+        DATA_LOGGER->close();
+        ERROR_HANDLER->close();
 
         return 0;
 }

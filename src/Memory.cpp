@@ -6,11 +6,11 @@
  */
 
 #include "Memory.h"
-#include "Exceptions.h"
+#include "utils/Exceptions.h"
 
 
 Memory::Memory() :
-        m_motorUsed(0),
+        m_motorUsedMask(0),
         m_direction(0),
         m_timeElapsed_s(0),
         m_confidence(0)
@@ -56,7 +56,7 @@ istream &operator>>(istream &strm, Memory mem)
     strm >> mem.m_initial.m_angAcceleration.pitch;
     strm >> mem.m_initial.m_angAcceleration.yaw;
 
-    strm >> mem.m_motorUsed;
+    strm >> mem.m_motorUsedMask;
     strm >> mem.m_timeElapsed_s;
 
     strm >> mem.m_final.m_displacement.x;
@@ -119,7 +119,7 @@ ostream &operator<<(ostream& strm, Memory mem)
     strm << mem.m_initial.m_angAcceleration.pitch;
     strm << mem.m_initial.m_angAcceleration.yaw;
 
-    strm << mem.m_motorUsed;
+    strm << mem.m_motorUsedMask;
     strm << mem.m_timeElapsed_s;
 
     strm << mem.m_final.m_displacement.x;

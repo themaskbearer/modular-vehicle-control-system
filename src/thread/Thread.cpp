@@ -7,7 +7,7 @@
 
 #include "Thread.h"
 
-#include "Exceptions.h"
+#include "utils/Exceptions.h"
 
 Thread::Thread() : m_thread(-1)
 {

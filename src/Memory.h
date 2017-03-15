@@ -46,7 +46,7 @@ public:
     State m_initial;
     State m_final;
 
-    int m_motorUsed;
+    int m_motorUsedMask;
     int m_direction;
     float m_timeElapsed_s;
 

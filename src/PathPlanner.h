@@ -10,9 +10,6 @@ using std::iterator;
 
 class PathPlanner
 {
-private:
-    vector<State> Locations;
-    vector<State>::iterator CurrentTarget;
 
 public:
     PathPlanner(void);
@@ -20,6 +17,12 @@ public:
 
     State GetTarget();
     void UpdateTarget(State CurrentState);
+
+private:
+    const float ERROR_THRESHOLD = 0.2;
+
+    vector<State> Locations;
+    vector<State>::iterator CurrentTarget;
 };
 
 #endif //PATHPLANNER

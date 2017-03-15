@@ -1,7 +1,7 @@
 
 
 #include "PathPlanner.h"
-#include "DataLogger.h"
+#include "utils/DataLogger.h"
 #include <cmath>
 
 
@@ -43,7 +43,7 @@ void PathPlanner::UpdateTarget(State CurrentState)
             pow(positionerror.m_displacement.z, 2);
     err = sqrt(err);
 
-    if(err < 0.2)
+    if(err < ERROR_THRESHOLD)
         CurrentTarget++;
 
     if(CurrentTarget == Locations.end())

@@ -8,11 +8,10 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
-#include <semaphore.h>
-
 #include <string>
 #include <fstream>
 
+#include "thread/Mutex.h"
 
 
 class GPIO
@@ -30,12 +29,12 @@ public:
     int readState(); //not implemented yet
 
 private:
-    sem_t m_access;
+    Mutex m_access;
     std::string m_location;
     std::ofstream m_direction;
     std::ofstream m_value;
-    bool m_initialized;
-    bool m_is144;
+    bool m_initialized = false;
+    bool m_is144 = false;
 
     void initialize144();
 };

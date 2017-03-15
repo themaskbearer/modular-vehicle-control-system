@@ -8,15 +8,13 @@
 #ifndef DATALOGGER_H_
 #define DATALOGGER_H_
 
-#include <semaphore.h>
-
 #include <fstream>
 #include <string>
 #include <queue>
 
-
 #include "Exceptions.h"
-#include "Thread.h"
+#include "thread/Thread.h"
+#include "thread/Mutex.h"
 #include "OperatorFunctions.h"
 
 class DataLogger : public Thread
@@ -39,17 +37,15 @@ private:
 
     bool m_initialized = false;
 
-    sem_t m_access;
-    std::ofstream m_datafile;
-    std::ofstream m_accelfile;
-    std::ofstream m_sensefile;
-    std::queue<std::string> m_datalist;
-    std::queue<std::string> m_accellist;
-    std::queue<std::string> m_senselist;
+    Mutex m_access;
+    std::ofstream m_dataFile;
+    std::ofstream m_accelFile;
+    std::ofstream m_senseFile;
+    std::vector<std::string> m_dataList;
+    std::vector<std::string> m_accelList;
+    std::vector<std::string> m_senseList;
 
-    void writeQueuetoFile();
-    void writeAcceltoFile();
-    void writeSensetoFile();
+    void writeQueuetoFile(std::vector<std::string>& queue);
     std::ostream& writeStringtoStream(std::ostream& streamtowrite, std::string str);
 
     void threadRoutine();

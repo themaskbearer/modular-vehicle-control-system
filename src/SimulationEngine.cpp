@@ -24,7 +24,7 @@ SimulationEngine::~SimulationEngine()
 
 State SimulationEngine::makeMovement(Memory memToMove)
 {
-        switch(memToMove.m_motorUsed)
+        switch(memToMove.m_motorUsedMask)
         {
                 case 1:
                         if(memToMove.m_direction & 1)

@@ -12,14 +12,15 @@
 
 class SimulationEngine
 {
-private:
-    State CurrentState;
-
 public:
     SimulationEngine();
     virtual ~SimulationEngine();
+
     State makeMovement(Memory memToMove);
     State getInitialState();
+
+private:
+    State CurrentState;
 };
 
 #endif /* SIMULATIONENGINE_H_ */
