@@ -57,7 +57,7 @@ void StateTracker::threadRoutine()
         SensorData readings = m_sensors.getSensorData();
         updateState(readings);
 
-        usleep(7100);
+        usleep(7100);   // Sample time is 10ms but due to processing time the sleep is reduced to get ~100 Hz
     }
 }
 
@@ -91,17 +91,25 @@ void StateTracker::updateState(SensorData data)
     m_currentState.m_angVelocity.pitch = (data.Gyro.X - GYROX_BIAS)*GYRO_SCALE_FCTR*RADIANS;
     m_currentState.m_angVelocity.yaw = (data.Gyro.Z - GYROZ_BIAS)*GYRO_SCALE_FCTR*RADIANS;
 
+    // Calculate the relative alpha, beta, and gamma angles that the vehicle has rotated through
+    // during the last timestep
     float a = m_currentState.m_angVelocity.yaw*DELTA_T;
     float b = m_currentState.m_angVelocity.roll*DELTA_T;
     float g = m_currentState.m_angVelocity.pitch*DELTA_T;
 
-    std::vector<float> temp = createRotationMatrix(a, b, g);
-    m_R = multiplyRMatrix(m_R, temp);
+    // Creates the rotation matrix for the amount of rotation that has occured during the last timestep
+    // It then takes this rotation and multiplies it against the global frame to update the global
+    // position and orientation of the vehicle
+    std::vector<float> latestRelativeRotation = createRotationMatrix(a, b, g);
+    m_R = multiplyRMatrix(m_R, latestRelativeRotation);
 
+    // Given the vehicle's current global orientation, calculate the amount of gravity that should be measured
+    // by the accelerometer along its X, Y, and Z axes.  GMAG is in sensor units (mGs or milli-Gs)
     float xg = m_R[6]*GMAG;
     float yg = m_R[7]*GMAG;
     float zg = m_R[8]*GMAG;
 
+    // Remove gravity from the accelerometer's measurements so that only the acceleration due to motion remains
     m_currentState.m_acceleration.x = data.Accelerometer.X - xg;
     m_currentState.m_acceleration.y = data.Accelerometer.Y - yg;
     m_currentState.m_acceleration.z = data.Accelerometer.Z - zg;
@@ -112,6 +120,7 @@ void StateTracker::updateState(SensorData data)
     p[1] = m_currentState.m_acceleration.y;
     p[2] = m_currentState.m_acceleration.z;
 
+    // Convert the acceleration measured in the vehicle's coordinate frame to the global coordinate frame
     p = multiplyPosition(m_R, p);
 
     m_currentState.m_acceleration.x = p[0];
@@ -122,6 +131,7 @@ void StateTracker::updateState(SensorData data)
     m_currentState.m_angPosition.yaw = atan2(m_R[3]/cos(m_currentState.m_angPosition.roll), m_R[0]/cos(m_currentState.m_angPosition.roll));
     m_currentState.m_angPosition.pitch = atan2(m_R[7]/cos(m_currentState.m_angPosition.roll), m_R[8]/cos(m_currentState.m_angPosition.roll));
 
+    // Pointers are used because in the following filter, a "++" operation is used to iterate through the struct
     float *accel, *vel, *pos;
 
     accel = &m_currentState.m_acceleration.x;
@@ -134,16 +144,26 @@ void StateTracker::updateState(SensorData data)
     lastvel = &m_lastState.m_velocity.x;
     lastpos = &m_lastState.m_displacement.x;
 
-    //Begin Acceleration processing
-
+    // Begin Acceleration processing
     for(int i = 0; i < 3; i++)
     {
+        // Converts sensor reading from mGs to m/s^2, then applies digital low pass filter to remove noise
         *accel = (*accel)*ACCEL_SCALE_FCTR*G_CONVERSION;
         *accel = *lastaccel + (*accel - *lastaccel)*ALPHA;
 
+        // A heavier low pass filter is used in an attempt to remove the bias/drift from the sensor
         m_biasFilter[i] = m_biasFilter[i] + (*accel - m_biasFilter[i])*HEAVY_ALPHA;
         *accel = *accel - m_biasFilter[i];
 
+        // Since between the bias filter and the orientation correction the vehicle's signal still resulted
+        // in significant amounts of drift, a final assumption was made that the vehicle's movement
+        // would either be starting or stopping, and that any periods of measured constant velocity are inaccurate
+        // and should be reported as 0 m/s
+        //
+        // This next section adjusts the vehicle's speed back down to 0 if the change in acceleration has been
+        // minimal over the last 33 samples (~1/3 of a second).  It uses a P loop to bring the velocity to 0
+        // using the error in the vehicle's velocity as compared to 0 multiplied by the gain of P to adjust the
+        // acceleration
         if((*accel - *lastaccel) < 0.05 )
         {
             m_accelCounter[i]++;
@@ -153,15 +173,15 @@ void StateTracker::updateState(SensorData data)
             m_accelCounter[i] = 0;
         }
 
-        float adjaccel = *accel;
+        float adjustedAccel = *accel;
 
         if(m_accelCounter[i] >= 33)
         {
             float error = (-(*lastvel));
-            adjaccel = error*P;
+            adjustedAccel = error*P;
         }
 
-        *vel = *lastvel + adjaccel*DELTA_T;
+        *vel = *lastvel + adjustedAccel*DELTA_T;
         *pos = *lastpos + (*vel)*DELTA_T;
 
         accel++;

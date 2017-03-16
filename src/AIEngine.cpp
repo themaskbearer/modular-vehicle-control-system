@@ -228,7 +228,7 @@ void AIEngine::followTargets()
 
 Memory* AIEngine::getBestMemory(const State& Target)
 {
-    float maxoptimization = 0;
+    float maxOptimization = 0;
     int seed = rand() % 100 / m_memories.size();
     vector<Memory>::iterator ReturnedMemory = m_memories.begin();
     for (int i = 0; i < seed - 1; i++)
@@ -237,11 +237,11 @@ Memory* AIEngine::getBestMemory(const State& Target)
     for (vector<Memory>::iterator iter = m_memories.begin(); iter != m_memories.end(); iter++)
     {
         State diff = iter->m_final - iter->m_initial;
-        float opt = compareStates(diff, Target);
+        float optimization = compareStates(diff, Target);
 
-        if (opt > maxoptimization && iter->m_confidence >= ReturnedMemory->m_confidence)
+        if (optimization > maxOptimization && iter->m_confidence >= ReturnedMemory->m_confidence)
         {
-            maxoptimization = opt;
+            maxOptimization = optimization;
             ReturnedMemory = iter;
         }
     }
