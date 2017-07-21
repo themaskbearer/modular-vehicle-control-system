@@ -18,13 +18,19 @@ using std::pair;
 class SystemGPIOs
 {
 public:
-    SystemGPIOs();
     virtual ~SystemGPIOs();
 
-    static GPIO* getGPIO(int gpioNumber);
+    static SystemGPIOs* instance() { if(m_instance == nullptr) m_instance = new SystemGPIOs(); return m_instance; }
+    GPIO* getGPIO(int gpioNumber);
 
 private:
-    static map<int, GPIO> GPIOS;
+    SystemGPIOs();
+
+    static SystemGPIOs* m_instance;
+
+    map<int, GPIO> GPIOS;
 };
+
+#define SYSTEM_GPIOS        SystemGPIOs::instance()
 
 #endif /* SYSTEMGPIOS_H_ */

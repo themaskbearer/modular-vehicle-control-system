@@ -10,7 +10,8 @@ Author: jpollard
 #include "SystemGPIOs.h"
 #include "MotorConstants.h"
 
-map<int, GPIO> SystemGPIOs::GPIOS;
+
+SystemGPIOs* SystemGPIOs::m_instance = nullptr;
 
 
 SystemGPIOs::SystemGPIOs()

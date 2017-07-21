@@ -19,8 +19,6 @@ int main()
 
         usleep(300000000); // 5 mins
 
-        SystemGPIOs IOs;
-
         AIEngine Controller;
         Controller.startThread();
 

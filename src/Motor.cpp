@@ -11,8 +11,8 @@
 
 Motor::Motor(int directionIO, int enableIO)
 {
-    m_direction = SystemGPIOs::getGPIO(directionIO);
-    m_enable = SystemGPIOs::getGPIO(enableIO);
+    m_direction = SYSTEM_GPIOS->getGPIO(directionIO);
+    m_enable = SYSTEM_GPIOS->getGPIO(enableIO);
 }
 
 
