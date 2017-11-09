@@ -8,7 +8,8 @@
 #ifndef SIMULATIONENGINE_H_
 #define SIMULATIONENGINE_H_
 
-#include "Memory.h"
+#include "State.h"
+#include "VehicleCommand.h"
 
 class SimulationEngine
 {
@@ -16,8 +17,8 @@ public:
     SimulationEngine();
     virtual ~SimulationEngine();
 
-    State makeMovement(Memory memToMove);
-    State getInitialState();
+    void makeMovement(const VehicleCommand& command);
+    State getState();
 
 private:
     State CurrentState;

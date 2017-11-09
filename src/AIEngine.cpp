@@ -42,31 +42,46 @@ void AIEngine::learnConfiguration()
 
     // if(Confidence < CONFIDENCE_LEVEL)
     // {
-        int motorUsedMask = 1;
+
+    // This method of learning isn't amazing for water, going alternate directions to "reverse"
+    // the previous move would probably be better, but this was easier to implement for now
+        std::vector<int> motorsUsedMasks;
+        std::vector<int> motorDirectionMasks;
 
         // Each motor individually
-        for (vector<Motor>::iterator iter = m_Motors.begin(); iter != m_Motors.end(); iter++)
+        motorsUsedMasks.push_back(1);
+        motorsUsedMasks.push_back(1);
+        motorsUsedMasks.push_back(2);
+        motorsUsedMasks.push_back(2);
+        // Both motors going the same direction
+        motorsUsedMasks.push_back(3);
+        motorsUsedMasks.push_back(3);
+        // Both motors going opposite
+        motorsUsedMasks.push_back(3);
+        motorsUsedMasks.push_back(3);
+
+        // Each motor individually
+        motorDirectionMasks.push_back(1);
+        motorDirectionMasks.push_back(0);
+        motorDirectionMasks.push_back(2);
+        motorDirectionMasks.push_back(0);
+        // Both motors going the same direction
+        motorDirectionMasks.push_back(3);
+        motorDirectionMasks.push_back(0);
+        // Both motors going opposite
+        motorDirectionMasks.push_back(1);
+        motorDirectionMasks.push_back(2);
+
+        auto motorDirIter = motorDirectionMasks.begin();
+        for(auto motorUsedIter = motorsUsedMasks.begin(); motorUsedIter != motorsUsedMasks.end(); ++motorUsedIter, ++motorDirIter)
         {
             for (int motorOnTime_s = 2; motorOnTime_s < 8; motorOnTime_s += 2)
             {
                 Memory newMem;
                 newMem.m_initial = m_imu.getCurrentState();
-                newMem.m_timeElapsed_s = motorOnTime_s;
-                newMem.m_motorUsedMask = motorUsedMask;
-                newMem.m_direction = motorUsedMask;
-                executeMemory(newMem);
-                newMem.m_final = m_imu.getCurrentState();
-                newMem.m_confidence = 50;
-                m_memories.push_back(newMem);
-
-                logMemory(newMemoryTitle, newMem);
-
-                usleep(2000000);
-
-                newMem.m_initial = m_imu.getCurrentState();
-                newMem.m_timeElapsed_s = motorOnTime_s;
-                newMem.m_motorUsedMask = motorUsedMask;
-                newMem.m_direction = 0;
+                newMem.m_command.m_timeElapsed_s = motorOnTime_s;
+                newMem.m_command.m_motorUsedMask = *motorUsedIter;
+                newMem.m_command.m_directionMask = *motorDirIter;
                 executeMemory(newMem);
                 newMem.m_final = m_imu.getCurrentState();
                 newMem.m_confidence = 50;
@@ -76,74 +91,6 @@ void AIEngine::learnConfiguration()
 
                 usleep(2000000);
             }
-
-            motorUsedMask = motorUsedMask << 1;
-        }
-
-        usleep(2000000);
-
-        // Both motors going the same direction
-        for (int t = 2; t < 8; t += 2)
-        {
-            Memory newMem;
-            newMem.m_initial = m_imu.getCurrentState();
-            newMem.m_timeElapsed_s = t;
-            newMem.m_motorUsedMask = 3;
-            newMem.m_direction = 3;
-            executeMemory(newMem);
-            newMem.m_final = m_imu.getCurrentState();
-            newMem.m_confidence = 50;
-            m_memories.push_back(newMem);
-
-            logMemory(newMemoryTitle, newMem);
-
-            usleep(2000000);
-
-            newMem.m_initial = m_imu.getCurrentState();
-            newMem.m_timeElapsed_s = t;
-            newMem.m_motorUsedMask = 3;
-            newMem.m_direction = 0;
-            executeMemory(newMem);
-            newMem.m_final = m_imu.getCurrentState();
-            newMem.m_confidence = 50;
-            m_memories.push_back(newMem);
-
-            logMemory(newMemoryTitle, newMem);
-
-            usleep(2000000);
-        }
-
-        usleep(2000000);
-
-        // Both motors going opposite
-        for (int t = 2; t < 8; t += 2)
-        {
-            Memory newMem;
-            newMem.m_initial = m_imu.getCurrentState();
-            newMem.m_timeElapsed_s = t;
-            newMem.m_motorUsedMask = 3;
-            newMem.m_direction = 1;
-            executeMemory(newMem);
-            newMem.m_final = m_imu.getCurrentState();
-            newMem.m_confidence = 50;
-            m_memories.push_back(newMem);
-
-            logMemory(newMemoryTitle, newMem);
-
-            usleep(2000000);
-
-            newMem.m_initial = m_imu.getCurrentState();
-            newMem.m_timeElapsed_s = t;
-            newMem.m_motorUsedMask = 3;
-            newMem.m_direction = 2;
-            executeMemory(newMem);
-            newMem.m_final = m_imu.getCurrentState();
-            newMem.m_confidence = 50;
-            m_memories.push_back(newMem);
-
-            logMemory(newMemoryTitle, newMem);
-
-            usleep(2000000);
         }
     // }
 }
@@ -265,9 +212,9 @@ void AIEngine::executeMemory(const Memory& mem)
     int base = 1;
     for (vector<Motor>::iterator iter = m_Motors.begin(); iter != m_Motors.end(); iter++)
     {
-        if (mem.m_motorUsedMask & base)
+        if (mem.m_command.m_motorUsedMask & base)
         {
-            if (mem.m_direction & base)
+            if (mem.m_command.m_directionMask & base)
                 iter->forward();
             else
                 iter->reverse();
@@ -278,7 +225,7 @@ void AIEngine::executeMemory(const Memory& mem)
         base = base << 1;
     }
 
-    usleep(mem.m_timeElapsed_s * 1000000);
+    usleep(mem.m_command.m_timeElapsed_s * 1000000);
 
     for (vector<Motor>::iterator iter = m_Motors.begin(); iter != m_Motors.end(); iter++)
         iter->off();
@@ -291,7 +238,7 @@ void AIEngine::logMemory(const std::string& title, const Memory& mem)
 
     State diff = mem.m_final - mem.m_initial;
 
-    str = str + mem.m_motorUsedMask + " " + mem.m_direction + " " + mem.m_timeElapsed_s + " " + mem.m_confidence + " "
+    str = str + mem.m_command.m_motorUsedMask + " " + mem.m_command.m_directionMask + " " + mem.m_command.m_timeElapsed_s + " " + mem.m_confidence + " "
             + diff.m_displacement.x + " " + diff.m_displacement.y + " " + diff.m_displacement.z + " " + diff.m_angPosition.roll + " "
             + diff.m_angPosition.pitch + " " + diff.m_angPosition.yaw;
 
