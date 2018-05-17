@@ -23,6 +23,7 @@ public:
     void runCommand(const VehicleCommand& command);
 
     void start() {};
+    void stop() {};
 
 private:
     SimulationEngine simulator;

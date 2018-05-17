@@ -9,36 +9,30 @@
 #define AIENGINE_H_
 
 #include "thread/Thread.h"
-#include "PathPlanner.h"
-#include "StateTracker.h"
-#include "Motor.h"
+#include "MovementController.h"
+#include "Memory.h"
+#include <vector>
 
-#define CONFIDENCE_LEVEL 50
-
-class AIEngine: public Thread
+class AIEngine : public MovementController
 {
 public:
-    AIEngine();
+    AIEngine(MemoryStorage* memories);
     virtual ~AIEngine();
 
+    VehicleCommand getCommandToExecute(const State& currentTarget, const State& currentState);
+    void processCommandResults(const State& finalState);
+
 private:
-    PathPlanner m_navigator;
-    StateTracker m_imu;
-    double m_confidence = 0;
-    vector<Memory> m_memories;
-    vector<Motor> m_Motors;
+    std::vector<Memory> m_memories;
 
-    void threadRoutine();
-
-    void learnConfiguration();
-    void followTargets();
+    State m_currentMoveInitialState;
+    State m_currentMovePrediction;
+    Memory* m_currentActingMemory = nullptr;
 
     Memory* getBestMemory(const State& Target);
-    void executeMemory(const Memory& mem);
 
     float compareStates(const State& state1, const State& state2);
 
-    void logMemory(const std::string& title, const Memory& mem);
     void logState(const std::string& title, const State& state);
 };
 

@@ -24,6 +24,7 @@ public:
     virtual void runCommand(const VehicleCommand& command) =0;
 
     virtual void start() =0;
+    virtual void stop() =0;
 };
 
 #endif /* VEHICLE_H_ */

@@ -7,6 +7,7 @@
 
 #include "Memory.h"
 #include "utils/Exceptions.h"
+#include "utils/OperatorFunctions.h"
 
 
 Memory::Memory() :
@@ -17,6 +18,18 @@ Memory::Memory() :
 
 Memory::~Memory()
 {
+}
+
+
+std::string Memory::to_str()
+{
+    State diff = m_final - m_initial;
+
+    std::string str = std::string() + m_command.m_motorUsedMask + " " + m_command.m_directionMask + " " + m_command.m_timeElapsed_s + " " + m_confidence + " "
+            + diff.m_displacement.x + " " + diff.m_displacement.y + " " + diff.m_displacement.z + " " + diff.m_angPosition.roll + " "
+            + diff.m_angPosition.pitch + " " + diff.m_angPosition.yaw;
+
+    return str;
 }
 
 

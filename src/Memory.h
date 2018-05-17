@@ -11,6 +11,7 @@
 #include "State.h"
 #include "VehicleCommand.h"
 
+#include <string>
 #include <fstream>
 using std::istream;
 using std::ostream;
@@ -19,7 +20,7 @@ class Memory
 {
 public:
     Memory();
-    virtual ~Memory();
+    ~Memory();
 
     State m_initial;
     State m_final;
@@ -27,6 +28,8 @@ public:
     VehicleCommand m_command;
 
     float m_confidence;
+
+    std::string to_str();
 };
 
 istream &operator>>(istream &strm, Memory mem);

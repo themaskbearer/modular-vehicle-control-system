@@ -7,21 +7,19 @@
 
 PathPlanner::PathPlanner()
 {
-    Locations.clear();
-
     State temp;
-    Locations.push_back(temp);
+    m_locations.push_back(temp);
 
     temp.m_displacement.x = 3;
-    Locations.push_back(temp);
+    m_locations.push_back(temp);
 
     temp.m_displacement.y = 2;
-    Locations.push_back(temp);
+    m_locations.push_back(temp);
 
     temp.m_displacement.x = 0;
-    Locations.push_back(temp);
+    m_locations.push_back(temp);
 
-    CurrentTarget = Locations.begin();
+    m_currentTarget = m_locations.begin();
 }
 
 
@@ -30,22 +28,22 @@ PathPlanner::~PathPlanner()
 }
 
 
-State PathPlanner::GetTarget()
+State PathPlanner::getTarget()
 {
-    return *CurrentTarget;
+    return *m_currentTarget;
 }
 
 
-void PathPlanner::UpdateTarget(State CurrentState)
+void PathPlanner::updateTarget(State CurrentState)
 {
-    State positionerror = CurrentState - *CurrentTarget;
+    State positionerror = CurrentState - *m_currentTarget;
     float err = pow(positionerror.m_displacement.x,2) + pow(positionerror.m_displacement.y, 2) +
             pow(positionerror.m_displacement.z, 2);
     err = sqrt(err);
 
     if(err < ERROR_THRESHOLD)
-        CurrentTarget++;
+        m_currentTarget++;
 
-    if(CurrentTarget == Locations.end())
-        CurrentTarget = Locations.begin();
+    if(m_currentTarget == m_locations.end())
+        m_currentTarget = m_locations.begin();
 }

@@ -249,6 +249,5 @@ std::vector<float> StateTracker::multiplyPosition(std::vector<float> R, std::vec
 State StateTracker::getCurrentState()
 {
     LockGuard guard(m_access);
-
     return m_lastState;
 }

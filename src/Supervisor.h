@@ -18,6 +18,7 @@ public:
     virtual ~Supervisor() {}
 
     virtual void start() =0;
+    virtual void stop() =0;
 
 protected:
     std::shared_ptr<Vehicle> m_vehicle;
