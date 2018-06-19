@@ -34,12 +34,15 @@ void ControlSystem::stop()
 
 void ControlSystem::threadRoutine()
 {
-    if(!m_learner.isLearningComplete())
-        runMovement(&m_learner);
-    else
-        runMovement(&m_controller);
+    while(true)
+    {
+        if(!m_learner.isLearningComplete())
+            runMovement(&m_learner);
+        else
+            runMovement(&m_controller);
 
-    usleep(2000000);
+        usleep(2000000);
+    }
 }
 
 

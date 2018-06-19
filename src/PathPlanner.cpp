@@ -13,10 +13,19 @@ PathPlanner::PathPlanner()
     temp.m_displacement.x = 3;
     m_locations.push_back(temp);
 
+    temp.m_angPosition.yaw = -M_PI_2;
+    m_locations.push_back(temp);
+
     temp.m_displacement.y = 2;
     m_locations.push_back(temp);
 
+    temp.m_angPosition.yaw -= -M_PI_2;
+    m_locations.push_back(temp);
+
     temp.m_displacement.x = 0;
+    m_locations.push_back(temp);
+
+    temp.m_angPosition.yaw -= -M_PI_2;
     m_locations.push_back(temp);
 
     m_currentTarget = m_locations.begin();

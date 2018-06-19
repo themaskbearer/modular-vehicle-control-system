@@ -23,8 +23,6 @@ public:
     void processCommandResults(const State& finalState);
 
 private:
-    std::vector<Memory> m_memories;
-
     State m_currentMoveInitialState;
     State m_currentMovePrediction;
     Memory* m_currentActingMemory = nullptr;
