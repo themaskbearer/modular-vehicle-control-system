@@ -23,64 +23,64 @@ GPIO::GPIO(const GPIO& old)
 
 GPIO::~GPIO()
 {
-    if(m_value.is_open())
-        m_value.close();
+    if(_value.is_open())
+        _value.close();
 
-    if(m_direction.is_open())
-        m_direction.close();
+    if(_direction.is_open())
+        _direction.close();
 }
 
 
 void GPIO::initialize(std::string gpioNumber)
 {
-    LockGuard guard(m_access);
+    LockGuard guard(_access);
 
     if(gpioNumber == "144")
         initialize144();
     else
     {
-        m_location = "/sys/class/gpio/gpio" + gpioNumber;
-        m_value.open((m_location + "/value").c_str());
+        _location = "/sys/class/gpio/gpio" + gpioNumber;
+        _value.open((_location + "/value").c_str());
 
-        m_direction.open((m_location + "/direction").c_str());
+        _direction.open((_location + "/direction").c_str());
 
-        if(!m_value.is_open())
-            ERROR_HANDLER->recordError(Exception("failed to open " + m_location + " value file"));
-        else if(!m_direction.is_open())
-            ERROR_HANDLER->recordError(Exception("failed to open " + m_location + " direction file"));
+        if(!_value.is_open())
+            ERROR_HANDLER->recordError(Exception("failed to open " + _location + " value file"));
+        else if(!_direction.is_open())
+            ERROR_HANDLER->recordError(Exception("failed to open " + _location + " direction file"));
         else
-            m_initialized = true;
+            _initialized = true;
     }
 }
 
 
 void GPIO::initialize144()
 {
-    m_is144 = true;
+    _is144 = true;
 
-    m_location = "/sys/class/gpio/gpio";
-    m_location += "144";
-    m_value.open((m_location + "/value").c_str());
+    _location = "/sys/class/gpio/gpio";
+    _location += "144";
+    _value.open((_location + "/value").c_str());
 
-    if(!m_value.is_open())
-        ERROR_HANDLER->recordError(Exception("failed to open " + m_location + " value file"));
+    if(!_value.is_open())
+        ERROR_HANDLER->recordError(Exception("failed to open " + _location + " value file"));
     else
-        m_initialized = true;
+        _initialized = true;
 }
 
 
 void GPIO::makeInput()
 {
-    if(m_is144)
+    if(_is144)
         return;
 
-    LockGuard guard(m_access);
+    LockGuard guard(_access);
 
-    if(!m_initialized)
-        throw Exception("Gpio " + m_location + " not intialized");
+    if(!_initialized)
+        throw Exception("Gpio " + _location + " not intialized");
 
     std::string str = "echo in > ";
-    str += m_location;
+    str += _location;
     str += "/direction";
     system(str.c_str());
 }
@@ -88,16 +88,16 @@ void GPIO::makeInput()
 
 void GPIO::makeOutput()
 {
-    if(m_is144)
+    if(_is144)
         return;
 
-    LockGuard guard(m_access);
+    LockGuard guard(_access);
 
-    if(!m_initialized)
-        throw Exception("Gpio " + m_location + " not intialized");
+    if(!_initialized)
+        throw Exception("Gpio " + _location + " not intialized");
 
     std::string str = "echo out > ";
-    str += m_location;
+    str += _location;
     str += "/direction";
     system(str.c_str());
 }
@@ -105,22 +105,22 @@ void GPIO::makeOutput()
 
 void GPIO::setState(int state)
 {
-    LockGuard guard(m_access);
+    LockGuard guard(_access);
 
-    if(!m_initialized)
-        throw Exception("Gpio " + m_location + " not intialized");
+    if(!_initialized)
+        throw Exception("Gpio " + _location + " not intialized");
 
     if(state == 0)
     {
         std::string str = "echo 0 > ";
-        str += m_location;
+        str += _location;
         str += "/value";
         system(str.c_str());
     }
     else
     {
         std::string str = "echo 1 > ";
-        str += m_location;
+        str += _location;
         str += "/value";
         system(str.c_str());
     }

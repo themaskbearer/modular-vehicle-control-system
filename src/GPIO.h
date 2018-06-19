@@ -29,12 +29,12 @@ public:
     int readState(); //not implemented yet
 
 private:
-    Mutex m_access;
-    std::string m_location;
-    std::ofstream m_direction;
-    std::ofstream m_value;
-    bool m_initialized = false;
-    bool m_is144 = false;
+    Mutex _access;
+    std::string _location;
+    std::ofstream _direction;
+    std::ofstream _value;
+    bool _initialized = false;
+    bool _is144 = false;
 
     void initialize144();
 };

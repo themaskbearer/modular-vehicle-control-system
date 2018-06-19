@@ -9,8 +9,8 @@
 
 ControlSystem::ControlSystem(std::shared_ptr<Vehicle> vehicle) :
     Supervisor(vehicle),
-    m_learner(vehicle->getNumberOfMotors(), &m_memories),
-    m_controller(&m_memories)
+    _learner(vehicle->getNumberOfMotors(), &_memories),
+    _controller(&_memories)
 {
 }
 
@@ -36,10 +36,10 @@ void ControlSystem::threadRoutine()
 {
     while(true)
     {
-        if(!m_learner.isLearningComplete())
-            runMovement(&m_learner);
+        if(!_learner.isLearningComplete())
+            runMovement(&_learner);
         else
-            runMovement(&m_controller);
+            runMovement(&_controller);
 
         usleep(2000000);
     }
@@ -48,13 +48,13 @@ void ControlSystem::threadRoutine()
 
 void ControlSystem::runMovement(MovementController* controller)
 {
-    State currentState = m_vehicle->getPose();
-    m_planner.updateTarget(currentState);
-    State currentTarget = m_planner.getTarget();
+    State currentState = _vehicle->getPose();
+    _planner.updateTarget(currentState);
+    State currentTarget = _planner.getTarget();
 
     VehicleCommand command = controller->getCommandToExecute(currentTarget, currentState);
-    m_vehicle->runCommand(command);
+    _vehicle->runCommand(command);
 
-    State newState = m_vehicle->getPose();
+    State newState = _vehicle->getPose();
     controller->processCommandResults(newState);
 }

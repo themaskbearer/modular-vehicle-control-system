@@ -23,20 +23,20 @@ public:
 
     // This will be based of off running through all the configurations once, but should eventually be based on the
     // confidence level
-    bool isLearningComplete() { return (m_learningIndex == m_motorsUsed.size()); }
+    bool isLearningComplete() { return (_learningIndex == _motorsUsed.size()); }
 
 private:
     const float CONFIDENCE_LEVEL = 50;
     const float INITIAL_CONFIDENCE = 50;
 
-    unsigned int m_numOfMotors = 0;
+    unsigned int _numOfMotors = 0;
 
-    double m_confidence = 0;
+    double _confidence = 0;
 
-    std::vector<int> m_motorsUsed;
-    std::vector<int> m_motorDirections;
-    std::vector<int> m_times_s;
-    unsigned int m_learningIndex = 0;
+    std::vector<int> _motorsUsed;
+    std::vector<int> _motorDirections;
+    std::vector<int> _times_s;
+    unsigned int _learningIndex = 0;
 
     Memory currentMemory;
 

@@ -11,9 +11,9 @@
 
 ConfigurationLearner::ConfigurationLearner(unsigned int numOfMotors, MemoryStorage* memories) :
     MovementController(memories),
-    m_numOfMotors(numOfMotors)
+    _numOfMotors(numOfMotors)
 {
-    int numberOfCombinations =std::pow(2, m_numOfMotors) - 1;
+    int numberOfCombinations =std::pow(2, _numOfMotors) - 1;
     for(int motorsUsedMask = 1; motorsUsedMask <= numberOfCombinations; ++motorsUsedMask)
     {
         addMotorDirectionCombinations(motorsUsedMask);
@@ -40,9 +40,9 @@ void ConfigurationLearner::addDurationVariations(unsigned int motorsUsedMask, un
 
     for(int timeToRun : secondsToRun)
     {
-        m_motorsUsed.push_back(motorsUsedMask);
-        m_motorDirections.push_back(motorDirectionMask);
-        m_times_s.push_back(timeToRun);
+        _motorsUsed.push_back(motorsUsedMask);
+        _motorDirections.push_back(motorDirectionMask);
+        _times_s.push_back(timeToRun);
     }
 }
 
@@ -61,12 +61,12 @@ VehicleCommand ConfigurationLearner::getCommandToExecute(const State& currentTar
     {
         currentMemory = Memory();
 
-        command.m_motorUsedMask = m_motorsUsed[m_learningIndex];
-        command.m_directionMask = m_motorDirections[m_learningIndex];
-        command.m_timeElapsed_s = m_times_s[m_learningIndex];
+        command._motorUsedMask = _motorsUsed[_learningIndex];
+        command._directionMask = _motorDirections[_learningIndex];
+        command._timeElapsed_s = _times_s[_learningIndex];
 
-        currentMemory.m_command = command;
-        currentMemory.m_initial = currentState;
+        currentMemory._command = command;
+        currentMemory._initial = currentState;
     }
 
     return command;
@@ -77,12 +77,12 @@ void ConfigurationLearner::processCommandResults(const State& finalState)
 {
     if(!isLearningComplete())
     {
-        currentMemory.m_final = finalState;
-        currentMemory.m_confidence = INITIAL_CONFIDENCE;
-        m_memories->push_back(currentMemory);
+        currentMemory._final = finalState;
+        currentMemory._confidence = INITIAL_CONFIDENCE;
+        _memories->push_back(currentMemory);
 
         DATA_LOGGER->recordData("New Memory:\n" + currentMemory.to_str());
 
-        ++m_learningIndex;
+        ++_learningIndex;
     }
 }

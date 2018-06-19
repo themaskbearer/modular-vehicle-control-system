@@ -34,15 +34,15 @@ void AUV::initialize()
     DATA_LOGGER->startThread();
 
     // TODO: add switch depending on configuration which vehicle to use
-    m_vehicle.reset(new SimulatedVehicle());
-    m_supervisor.reset(new ControlSystem(m_vehicle));
+    _vehicle.reset(new SimulatedVehicle());
+    _supervisor.reset(new ControlSystem(_vehicle));
 }
 
 
 void AUV::run()
 {
-    m_vehicle->start();
-    m_supervisor->start();
+    _vehicle->start();
+    _supervisor->start();
 
     while(true)
         usleep(1000000);

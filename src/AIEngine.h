@@ -23,9 +23,9 @@ public:
     void processCommandResults(const State& finalState);
 
 private:
-    State m_currentMoveInitialState;
-    State m_currentMovePrediction;
-    Memory* m_currentActingMemory = nullptr;
+    State _currentMoveInitialState;
+    State _currentMovePrediction;
+    Memory* _currentActingMemory = nullptr;
 
     Memory* getBestMemory(const State& Target);
 

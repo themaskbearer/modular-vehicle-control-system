@@ -11,7 +11,7 @@ Author: jpollard
 #include "MotorConstants.h"
 
 
-SystemGPIOs* SystemGPIOs::m_instance = nullptr;
+SystemGPIOs* SystemGPIOs::_instance = nullptr;
 
 
 SystemGPIOs::SystemGPIOs()

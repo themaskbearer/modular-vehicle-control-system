@@ -21,8 +21,8 @@ public:
 private:
     const float ERROR_THRESHOLD = 0.2;
 
-    vector<State> m_locations;
-    vector<State>::iterator m_currentTarget;
+    vector<State> _locations;
+    vector<State>::iterator _currentTarget;
 };
 
 #endif //PATHPLANNER

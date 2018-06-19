@@ -25,13 +25,13 @@ struct RotProjection
 
 struct State
 {
-    AxesProjection m_displacement;
-    AxesProjection m_velocity;
-    AxesProjection m_acceleration;
+    AxesProjection _displacement;
+    AxesProjection _velocity;
+    AxesProjection _acceleration;
 
-    RotProjection m_angPosition;
-    RotProjection m_angVelocity;
-    RotProjection m_angAcceleration;
+    RotProjection _angPosition;
+    RotProjection _angVelocity;
+    RotProjection _angAcceleration;
 };
 
 

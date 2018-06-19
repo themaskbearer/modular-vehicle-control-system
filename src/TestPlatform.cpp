@@ -11,8 +11,8 @@
 
 TestPlatform::TestPlatform()
 {
-    m_motors.push_back(Motor(MOTOR1DIR, MOTOR1EN));
-    m_motors.push_back(Motor(MOTOR2DIR, MOTOR2EN));
+    _motors.push_back(Motor(MOTOR1DIR, MOTOR1EN));
+    _motors.push_back(Motor(MOTOR2DIR, MOTOR2EN));
     //Motors.push_back(Motor(MOTOR3DIR, MOTOR3EN));
 }
 
@@ -26,11 +26,11 @@ TestPlatform::~TestPlatform()
 void TestPlatform::runCommand(const VehicleCommand& command)
 {
     int base = 1;
-    for(auto& motor : m_motors)
+    for(auto& motor : _motors)
     {
-        if(command.m_motorUsedMask & base)
+        if(command._motorUsedMask & base)
         {
-            if(command.m_directionMask & base)
+            if(command._directionMask & base)
                 motor.forward();
             else
                 motor.reverse();
@@ -41,14 +41,14 @@ void TestPlatform::runCommand(const VehicleCommand& command)
         base = base << 1;
     }
 
-    usleep(command.m_timeElapsed_s * 1000000);
+    usleep(command._timeElapsed_s * 1000000);
 
-    for(auto& motor : m_motors)
+    for(auto& motor : _motors)
         motor.off();
 }
 
 
 void TestPlatform::start()
 {
-    m_imu.startThread();
+    _imu.startThread();
 }

@@ -20,13 +20,13 @@ class SystemGPIOs
 public:
     virtual ~SystemGPIOs();
 
-    static SystemGPIOs* instance() { if(m_instance == nullptr) m_instance = new SystemGPIOs(); return m_instance; }
+    static SystemGPIOs* instance() { if(_instance == nullptr) _instance = new SystemGPIOs(); return _instance; }
     GPIO* getGPIO(int gpioNumber);
 
 private:
     SystemGPIOs();
 
-    static SystemGPIOs* m_instance;
+    static SystemGPIOs* _instance;
 
     map<int, GPIO> GPIOS;
 };

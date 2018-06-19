@@ -11,7 +11,7 @@
 #include <iostream>
 
 
-ErrorHandler* ErrorHandler::m_instance = nullptr;
+ErrorHandler* ErrorHandler::_instance = nullptr;
 
 
 ErrorHandler::ErrorHandler()
@@ -21,28 +21,28 @@ ErrorHandler::ErrorHandler()
 
 ErrorHandler::~ErrorHandler()
 {
-    if(m_initialized)
+    if(_initialized)
         close();
 }
 
 
 void ErrorHandler::initialize(const std::string& filePath)
 {
-    m_errorfile.open(filePath.c_str(), std::istream::app);
-    if(!m_errorfile.is_open())
+    _errorfile.open(filePath.c_str(), std::istream::app);
+    if(!_errorfile.is_open())
         std::cerr << "Can't open error file log...\n";
     else
-        m_errorfile << "\n\n\nNEW SESSION\n";
+        _errorfile << "\n\n\nNEW SESSION\n";
 
-    m_initialized = true;
+    _initialized = true;
 }
 
 
 void ErrorHandler::close()
 {
-    m_initialized = false;
+    _initialized = false;
 
-    m_errorfile.close();
+    _errorfile.close();
 }
 
 
@@ -62,13 +62,13 @@ void ErrorHandler::writeQueuetoFile()
     std::vector<Exception> newErrors;
 
     {
-        LockGuard guard(m_access);
-        newErrors = m_errorlist;
-        m_errorlist.clear();
+        LockGuard guard(_access);
+        newErrors = _errorlist;
+        _errorlist.clear();
     }
 
     for(auto& error : newErrors)
-        writeExecptiontoStream(m_errorfile, error);
+        writeExecptiontoStream(_errorfile, error);
 }
 
 
@@ -85,6 +85,6 @@ std::ostream& ErrorHandler::writeExecptiontoStream(std::ostream& streamtowrite, 
 
 void ErrorHandler::recordError(const Exception& e)
 {
-    LockGuard guard(m_access);
-    m_errorlist.push_back(e);
+    LockGuard guard(_access);
+    _errorlist.push_back(e);
 }

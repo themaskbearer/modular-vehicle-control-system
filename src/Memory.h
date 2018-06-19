@@ -22,12 +22,12 @@ public:
     Memory();
     ~Memory();
 
-    State m_initial;
-    State m_final;
+    State _initial;
+    State _final;
 
-    VehicleCommand m_command;
+    VehicleCommand _command;
 
-    float m_confidence;
+    float _confidence;
 
     std::string to_str();
 };

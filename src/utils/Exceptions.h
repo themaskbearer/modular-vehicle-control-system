@@ -19,12 +19,12 @@ public:
     Exception(std::string msg, int errorValue);
     virtual ~Exception();
 
-    const std::string& getMessage() const { return m_message; }
-    int getErrorValue() const { return m_errorValue; }
+    const std::string& getMessage() const { return _message; }
+    int getErrorValue() const { return _errorValue; }
 
 private:
-    std::string m_message;
-    int m_errorValue;
+    std::string _message;
+    int _errorValue;
 };
 
 #endif /* EXCEPTION_H_ */

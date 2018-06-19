@@ -22,7 +22,7 @@ class ErrorHandler : public Thread
 public:
     virtual ~ErrorHandler();
 
-    static ErrorHandler* instance() { if(m_instance == nullptr) m_instance = new ErrorHandler(); return m_instance; }
+    static ErrorHandler* instance() { if(_instance == nullptr) _instance = new ErrorHandler(); return _instance; }
 
     void initialize(const std::string& filePath);
     void close();
@@ -31,13 +31,13 @@ public:
 
 private:
     ErrorHandler();
-    static ErrorHandler* m_instance;
+    static ErrorHandler* _instance;
 
-    bool m_initialized = false;
+    bool _initialized = false;
 
-    Mutex m_access;
-    std::ofstream m_errorfile;
-    std::vector<Exception> m_errorlist;
+    Mutex _access;
+    std::ofstream _errorfile;
+    std::vector<Exception> _errorlist;
 
     void threadRoutine();
 

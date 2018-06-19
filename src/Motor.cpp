@@ -11,15 +11,15 @@
 
 Motor::Motor(int directionIO, int enableIO)
 {
-    m_direction = SYSTEM_GPIOS->getGPIO(directionIO);
-    m_enable = SYSTEM_GPIOS->getGPIO(enableIO);
+    _direction = SYSTEM_GPIOS->getGPIO(directionIO);
+    _enable = SYSTEM_GPIOS->getGPIO(enableIO);
 }
 
 
 Motor::Motor(const Motor &oldMotor)
 {
-    m_direction = oldMotor.m_direction;
-    m_enable = oldMotor.m_enable;
+    _direction = oldMotor._direction;
+    _enable = oldMotor._enable;
 }
 
 
@@ -30,23 +30,23 @@ Motor::~Motor()
 
 void Motor::on()
 {
-    m_enable->setState(1);
+    _enable->setState(1);
 }
 
 
 void Motor::off()
 {
-    m_enable->setState(0);
+    _enable->setState(0);
 }
 
 
 void Motor::forward()
 {
-    m_direction->setState(1);
+    _direction->setState(1);
 }
 
 
 void Motor::reverse()
 {
-    m_direction->setState(0);
+    _direction->setState(0);
 }

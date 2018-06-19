@@ -23,22 +23,22 @@ using std::pow;
 
 StateTracker::StateTracker()
 {
-    m_R.push_back(1);
-    m_R.push_back(0);
-    m_R.push_back(0);
+    _R.push_back(1);
+    _R.push_back(0);
+    _R.push_back(0);
 
-    m_R.push_back(0);
-    m_R.push_back(1);
-    m_R.push_back(0);
+    _R.push_back(0);
+    _R.push_back(1);
+    _R.push_back(0);
 
-    m_R.push_back(0);
-    m_R.push_back(0);
-    m_R.push_back(1);
+    _R.push_back(0);
+    _R.push_back(0);
+    _R.push_back(1);
 
     for(int i = 0; i < 3; i++)
     {
-        m_accelCounter[i] = 0;
-        m_biasFilter[i] = 0;
+        _accelCounter[i] = 0;
+        _biasFilter[i] = 0;
     }
 }
 
@@ -54,7 +54,7 @@ void StateTracker::threadRoutine()
 
     while(true)
     {
-        SensorData readings = m_sensors.getSensorData();
+        SensorData readings = _sensors.getSensorData();
         updateState(readings);
 
         usleep(7100);   // Sample time is 10ms but due to processing time the sleep is reduced to get ~100 Hz
@@ -64,21 +64,21 @@ void StateTracker::threadRoutine()
 
 void StateTracker::initializeOrientation()
 {
-    SensorData Initial = m_sensors.getSensorData();
+    SensorData Initial = _sensors.getSensorData();
 
     float g = atan2((float)Initial.Accelerometer.Y, (float)Initial.Accelerometer.Z);
     float b = asin(-(float)Initial.Accelerometer.X/GMAG);
     float a = 0;
 
     std::vector<float> temp = createRotationMatrix(a, b, g);
-    m_R = multiplyRMatrix(m_R, temp);
+    _R = multiplyRMatrix(_R, temp);
 
 //    CurrentState.RPY.pitch = g;
 //    CurrentState.RPY.roll = b;
-//    if(!sem_wait(&Access))
+//    if(!se_wait(&Access))
 //    {
 //        LastState = CurrentState;
-//        sem_post(&Access);
+//        se_post(&Access);
 //    }
 
     //Add functionality to gain initial rotation speeds as well
@@ -87,62 +87,62 @@ void StateTracker::initializeOrientation()
 
 void StateTracker::updateState(SensorData data)
 {
-    m_currentState.m_angVelocity.roll = (data.Gyro.Y - GYROY_BIAS)*GYRO_SCALE_FCTR*RADIANS;
-    m_currentState.m_angVelocity.pitch = (data.Gyro.X - GYROX_BIAS)*GYRO_SCALE_FCTR*RADIANS;
-    m_currentState.m_angVelocity.yaw = (data.Gyro.Z - GYROZ_BIAS)*GYRO_SCALE_FCTR*RADIANS;
+    _currentState._angVelocity.roll = (data.Gyro.Y - GYROY_BIAS)*GYRO_SCALE_FCTR*RADIANS;
+    _currentState._angVelocity.pitch = (data.Gyro.X - GYROX_BIAS)*GYRO_SCALE_FCTR*RADIANS;
+    _currentState._angVelocity.yaw = (data.Gyro.Z - GYROZ_BIAS)*GYRO_SCALE_FCTR*RADIANS;
 
     // Calculate the relative alpha, beta, and gamma angles that the vehicle has rotated through
     // during the last timestep
-    float a = m_currentState.m_angVelocity.yaw*DELTA_T;
-    float b = m_currentState.m_angVelocity.roll*DELTA_T;
-    float g = m_currentState.m_angVelocity.pitch*DELTA_T;
+    float a = _currentState._angVelocity.yaw*DELTA_T;
+    float b = _currentState._angVelocity.roll*DELTA_T;
+    float g = _currentState._angVelocity.pitch*DELTA_T;
 
     // Creates the rotation matrix for the amount of rotation that has occured during the last timestep
     // It then takes this rotation and multiplies it against the global frame to update the global
     // position and orientation of the vehicle
     std::vector<float> latestRelativeRotation = createRotationMatrix(a, b, g);
-    m_R = multiplyRMatrix(m_R, latestRelativeRotation);
+    _R = multiplyRMatrix(_R, latestRelativeRotation);
 
     // Given the vehicle's current global orientation, calculate the amount of gravity that should be measured
     // by the accelerometer along its X, Y, and Z axes.  GMAG is in sensor units (mGs or milli-Gs)
-    float xg = m_R[6]*GMAG;
-    float yg = m_R[7]*GMAG;
-    float zg = m_R[8]*GMAG;
+    float xg = _R[6]*GMAG;
+    float yg = _R[7]*GMAG;
+    float zg = _R[8]*GMAG;
 
     // Remove gravity from the accelerometer's measurements so that only the acceleration due to motion remains
-    m_currentState.m_acceleration.x = data.Accelerometer.X - xg;
-    m_currentState.m_acceleration.y = data.Accelerometer.Y - yg;
-    m_currentState.m_acceleration.z = data.Accelerometer.Z - zg;
+    _currentState._acceleration.x = data.Accelerometer.X - xg;
+    _currentState._acceleration.y = data.Accelerometer.Y - yg;
+    _currentState._acceleration.z = data.Accelerometer.Z - zg;
 
     std::vector<float> p(3, 0);
 
-    p[0] = m_currentState.m_acceleration.x;
-    p[1] = m_currentState.m_acceleration.y;
-    p[2] = m_currentState.m_acceleration.z;
+    p[0] = _currentState._acceleration.x;
+    p[1] = _currentState._acceleration.y;
+    p[2] = _currentState._acceleration.z;
 
     // Convert the acceleration measured in the vehicle's coordinate frame to the global coordinate frame
-    p = multiplyPosition(m_R, p);
+    p = multiplyPosition(_R, p);
 
-    m_currentState.m_acceleration.x = p[0];
-    m_currentState.m_acceleration.y = p[1];
-    m_currentState.m_acceleration.z = p[2];
+    _currentState._acceleration.x = p[0];
+    _currentState._acceleration.y = p[1];
+    _currentState._acceleration.z = p[2];
 
-    m_currentState.m_angPosition.roll = atan2(-m_R[6], sqrt(pow(m_R[0],2) + pow(m_R[3],2)));
-    m_currentState.m_angPosition.yaw = atan2(m_R[3]/cos(m_currentState.m_angPosition.roll), m_R[0]/cos(m_currentState.m_angPosition.roll));
-    m_currentState.m_angPosition.pitch = atan2(m_R[7]/cos(m_currentState.m_angPosition.roll), m_R[8]/cos(m_currentState.m_angPosition.roll));
+    _currentState._angPosition.roll = atan2(-_R[6], sqrt(pow(_R[0],2) + pow(_R[3],2)));
+    _currentState._angPosition.yaw = atan2(_R[3]/cos(_currentState._angPosition.roll), _R[0]/cos(_currentState._angPosition.roll));
+    _currentState._angPosition.pitch = atan2(_R[7]/cos(_currentState._angPosition.roll), _R[8]/cos(_currentState._angPosition.roll));
 
     // Pointers are used because in the following filter, a "++" operation is used to iterate through the struct
     float *accel, *vel, *pos;
 
-    accel = &m_currentState.m_acceleration.x;
-    vel = &m_currentState.m_velocity.x;
-    pos = &m_currentState.m_displacement.x;
+    accel = &_currentState._acceleration.x;
+    vel = &_currentState._velocity.x;
+    pos = &_currentState._displacement.x;
 
     float *lastaccel, *lastvel, *lastpos;
 
-    lastaccel = &m_lastState.m_acceleration.x;
-    lastvel = &m_lastState.m_velocity.x;
-    lastpos = &m_lastState.m_displacement.x;
+    lastaccel = &_lastState._acceleration.x;
+    lastvel = &_lastState._velocity.x;
+    lastpos = &_lastState._displacement.x;
 
     // Begin Acceleration processing
     for(int i = 0; i < 3; i++)
@@ -152,8 +152,8 @@ void StateTracker::updateState(SensorData data)
         *accel = *lastaccel + (*accel - *lastaccel)*ALPHA;
 
         // A heavier low pass filter is used in an attempt to remove the bias/drift from the sensor
-        m_biasFilter[i] = m_biasFilter[i] + (*accel - m_biasFilter[i])*HEAVY_ALPHA;
-        *accel = *accel - m_biasFilter[i];
+        _biasFilter[i] = _biasFilter[i] + (*accel - _biasFilter[i])*HEAVY_ALPHA;
+        *accel = *accel - _biasFilter[i];
 
         // Since between the bias filter and the orientation correction the vehicle's signal still resulted
         // in significant amounts of drift, a final assumption was made that the vehicle's movement
@@ -166,16 +166,16 @@ void StateTracker::updateState(SensorData data)
         // acceleration
         if((*accel - *lastaccel) < 0.05 )
         {
-            m_accelCounter[i]++;
+            _accelCounter[i]++;
         }
         else
         {
-            m_accelCounter[i] = 0;
+            _accelCounter[i] = 0;
         }
 
         float adjustedAccel = *accel;
 
-        if(m_accelCounter[i] >= 33)
+        if(_accelCounter[i] >= 33)
         {
             float error = (-(*lastvel));
             adjustedAccel = error*P;
@@ -195,8 +195,8 @@ void StateTracker::updateState(SensorData data)
 
 
     {
-        LockGuard guard(m_access);
-        m_lastState = m_currentState;
+        LockGuard guard(_access);
+        _lastState = _currentState;
     }
 }
 
@@ -248,6 +248,6 @@ std::vector<float> StateTracker::multiplyPosition(std::vector<float> R, std::vec
 
 State StateTracker::getCurrentState()
 {
-    LockGuard guard(m_access);
-    return m_lastState;
+    LockGuard guard(_access);
+    return _lastState;
 }

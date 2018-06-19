@@ -9,15 +9,15 @@
 
 
 Exception::Exception(std::string msg) :
-        m_message(msg),
-        m_errorValue(0)
+        _message(msg),
+        _errorValue(0)
 {
 }
 
 
 Exception::Exception(std::string msg, int errorValue) :
-        m_message(msg),
-        m_errorValue(errorValue)
+        _message(msg),
+        _errorValue(errorValue)
 {
 }
 

@@ -14,14 +14,14 @@
 
 class Supervisor {
 public:
-    Supervisor(std::shared_ptr<Vehicle> vehicle) : m_vehicle(vehicle) {}
+    Supervisor(std::shared_ptr<Vehicle> vehicle) : _vehicle(vehicle) {}
     virtual ~Supervisor() {}
 
     virtual void start() =0;
     virtual void stop() =0;
 
 protected:
-    std::shared_ptr<Vehicle> m_vehicle;
+    std::shared_ptr<Vehicle> _vehicle;
 };
 
 #endif /* SRC_SUPERVISOR_H_ */

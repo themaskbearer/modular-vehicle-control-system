@@ -17,7 +17,7 @@ public:
     virtual ~LockGuard();
 
 private:
-    Mutex& m_mutex;
+    Mutex& _mutex;
 
 };
 

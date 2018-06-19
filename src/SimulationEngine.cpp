@@ -24,39 +24,39 @@ SimulationEngine::~SimulationEngine()
 
 void SimulationEngine::makeMovement(const VehicleCommand& command)
 {
-        switch(command.m_motorUsedMask)
+        switch(command._motorUsedMask)
         {
                 case 1:
-                        if(command.m_directionMask & 1)
-                                CurrentState.m_angPosition.yaw += command.m_timeElapsed_s*M_PI/8;
+                        if(command._directionMask & 1)
+                                CurrentState._angPosition.yaw += command._timeElapsed_s*M_PI/8;
                         else
-                                CurrentState.m_angPosition.yaw -= command.m_timeElapsed_s*M_PI/8;
+                                CurrentState._angPosition.yaw -= command._timeElapsed_s*M_PI/8;
                         break;
                 case 2:
-                        if(command.m_directionMask & 2)
-                                CurrentState.m_angPosition.yaw -= command.m_timeElapsed_s*M_PI/8;
+                        if(command._directionMask & 2)
+                                CurrentState._angPosition.yaw -= command._timeElapsed_s*M_PI/8;
                         else
-                                CurrentState.m_angPosition.yaw += command.m_timeElapsed_s*M_PI/8;
+                                CurrentState._angPosition.yaw += command._timeElapsed_s*M_PI/8;
                         break;
                 case 3:
-                        if(command.m_directionMask == 3)
+                        if(command._directionMask == 3)
                         {
-                                CurrentState.m_displacement.x +=
-                                        command.m_timeElapsed_s*0.5*cos(CurrentState.m_angPosition.yaw);
-                                CurrentState.m_displacement.y +=
-                                        command.m_timeElapsed_s*0.5*sin(CurrentState.m_angPosition.yaw);
+                                CurrentState._displacement.x +=
+                                        command._timeElapsed_s*0.5*cos(CurrentState._angPosition.yaw);
+                                CurrentState._displacement.y +=
+                                        command._timeElapsed_s*0.5*sin(CurrentState._angPosition.yaw);
                         }
-                        else if(command.m_directionMask == 0)
+                        else if(command._directionMask == 0)
                         {
-                                CurrentState.m_displacement.x -=
-                                        command.m_timeElapsed_s*0.5*cos(CurrentState.m_angPosition.yaw);
-                                CurrentState.m_displacement.y -=
-                                        command.m_timeElapsed_s*0.5*sin(CurrentState.m_angPosition.yaw);
+                                CurrentState._displacement.x -=
+                                        command._timeElapsed_s*0.5*cos(CurrentState._angPosition.yaw);
+                                CurrentState._displacement.y -=
+                                        command._timeElapsed_s*0.5*sin(CurrentState._angPosition.yaw);
                         }
-                        else if(command.m_directionMask == 1)
-                                CurrentState.m_angPosition.yaw += command.m_timeElapsed_s*M_PI/4;
+                        else if(command._directionMask == 1)
+                                CurrentState._angPosition.yaw += command._timeElapsed_s*M_PI/4;
                         else
-                                CurrentState.m_angPosition.yaw -= command.m_timeElapsed_s*M_PI/4;
+                                CurrentState._angPosition.yaw -= command._timeElapsed_s*M_PI/4;
                         break;
         }
 }

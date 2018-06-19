@@ -11,7 +11,7 @@
 
 Mutex::Mutex()
 {
-    int error = pthread_mutex_init(&m_mutex, NULL);
+    int error = pthread_mutex_init(&_mutex, NULL);
     if(error)
         throw Exception("Failed to initialize mutex", errno);
 }
@@ -19,7 +19,7 @@ Mutex::Mutex()
 
 Mutex::~Mutex()
 {
-    int error = pthread_mutex_destroy(&m_mutex);
+    int error = pthread_mutex_destroy(&_mutex);
     if(error)
         ERROR_HANDLER->recordError(Exception("Failed to destroy mutex", errno));
 }
@@ -27,7 +27,7 @@ Mutex::~Mutex()
 
 void Mutex::lock()
 {
-    int error = pthread_mutex_lock(&m_mutex);
+    int error = pthread_mutex_lock(&_mutex);
     if(error)
         throw Exception("Failed to lock mutex", errno);
 }
@@ -35,7 +35,7 @@ void Mutex::lock()
 
 void Mutex::unlock()
 {
-    int error = pthread_mutex_unlock(&m_mutex);
+    int error = pthread_mutex_unlock(&_mutex);
         if(error)
             throw Exception("Failed to unlock mutex", errno);
 }

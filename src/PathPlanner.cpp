@@ -8,27 +8,27 @@
 PathPlanner::PathPlanner()
 {
     State temp;
-    m_locations.push_back(temp);
+    _locations.push_back(temp);
 
-    temp.m_displacement.x = 3;
-    m_locations.push_back(temp);
+    temp._displacement.x = 3;
+    _locations.push_back(temp);
 
-    temp.m_angPosition.yaw = -M_PI_2;
-    m_locations.push_back(temp);
+    temp._angPosition.yaw = -M_PI_2;
+    _locations.push_back(temp);
 
-    temp.m_displacement.y = 2;
-    m_locations.push_back(temp);
+    temp._displacement.y = 2;
+    _locations.push_back(temp);
 
-    temp.m_angPosition.yaw -= -M_PI_2;
-    m_locations.push_back(temp);
+    temp._angPosition.yaw -= -M_PI_2;
+    _locations.push_back(temp);
 
-    temp.m_displacement.x = 0;
-    m_locations.push_back(temp);
+    temp._displacement.x = 0;
+    _locations.push_back(temp);
 
-    temp.m_angPosition.yaw -= -M_PI_2;
-    m_locations.push_back(temp);
+    temp._angPosition.yaw -= -M_PI_2;
+    _locations.push_back(temp);
 
-    m_currentTarget = m_locations.begin();
+    _currentTarget = _locations.begin();
 }
 
 
@@ -39,20 +39,20 @@ PathPlanner::~PathPlanner()
 
 State PathPlanner::getTarget()
 {
-    return *m_currentTarget;
+    return *_currentTarget;
 }
 
 
 void PathPlanner::updateTarget(State CurrentState)
 {
-    State positionerror = CurrentState - *m_currentTarget;
-    float err = pow(positionerror.m_displacement.x,2) + pow(positionerror.m_displacement.y, 2) +
-            pow(positionerror.m_displacement.z, 2);
+    State positionerror = CurrentState - *_currentTarget;
+    float err = pow(positionerror._displacement.x,2) + pow(positionerror._displacement.y, 2) +
+            pow(positionerror._displacement.z, 2);
     err = sqrt(err);
 
     if(err < ERROR_THRESHOLD)
-        m_currentTarget++;
+        _currentTarget++;
 
-    if(m_currentTarget == m_locations.end())
-        m_currentTarget = m_locations.begin();
+    if(_currentTarget == _locations.end())
+        _currentTarget = _locations.begin();
 }

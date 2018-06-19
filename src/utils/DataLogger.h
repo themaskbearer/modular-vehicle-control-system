@@ -22,7 +22,7 @@ class DataLogger : public Thread
 public:
     virtual ~DataLogger();
 
-    static DataLogger* instance() { if(m_instance == nullptr) m_instance = new DataLogger(); return m_instance; }
+    static DataLogger* instance() { if(_instance == nullptr) _instance = new DataLogger(); return _instance; }
 
     void initialize();
     void close();
@@ -32,18 +32,18 @@ public:
     void recordSense(std::string data);
 
 private:
-    static DataLogger* m_instance;
+    static DataLogger* _instance;
     DataLogger();
 
-    bool m_initialized = false;
+    bool _initialized = false;
 
-    Mutex m_access;
-    std::ofstream m_dataFile;
-    std::ofstream m_accelFile;
-    std::ofstream m_senseFile;
-    std::vector<std::string> m_dataList;
-    std::vector<std::string> m_accelList;
-    std::vector<std::string> m_senseList;
+    Mutex _access;
+    std::ofstream _dataFile;
+    std::ofstream _accelFile;
+    std::ofstream _senseFile;
+    std::vector<std::string> _dataList;
+    std::vector<std::string> _accelList;
+    std::vector<std::string> _senseList;
 
     void writeQueuetoFile(std::vector<std::string>& queue);
     std::ostream& writeStringtoStream(std::ostream& streamtowrite, std::string str);

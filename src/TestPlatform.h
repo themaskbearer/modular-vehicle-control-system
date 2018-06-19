@@ -18,17 +18,17 @@ public:
     TestPlatform();
     virtual ~TestPlatform();
 
-    State getPose() { return m_imu.getCurrentState(); }
-    int getNumberOfMotors() { return m_motors.size(); }
+    State getPose() { return _imu.getCurrentState(); }
+    int getNumberOfMotors() { return _motors.size(); }
 
     void runCommand(const VehicleCommand& command);
 
     void start();
 
 private:
-    std::vector<Motor> m_motors;
+    std::vector<Motor> _motors;
 
-    StateTracker m_imu;
+    StateTracker _imu;
 };
 
 #endif /* SRC_TESTPLATFORM_H_ */

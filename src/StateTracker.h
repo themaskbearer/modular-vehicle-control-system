@@ -43,14 +43,14 @@ public:
     State getCurrentState();
 
 private:
-    I2cHandler m_sensors;
-    State m_currentState;
-    State m_lastState;
-    std::vector<float> m_R;
-    int m_accelCounter[3];
-    float m_biasFilter[3];
+    I2cHandler _sensors;
+    State _currentState;
+    State _lastState;
+    std::vector<float> _R;
+    int _accelCounter[3];
+    float _biasFilter[3];
 
-    Mutex m_access;
+    Mutex _access;
 
     void threadRoutine();
     void initializeOrientation();

@@ -20,7 +20,7 @@ public:
     void startThread();
 
 private:
-    pthread_t m_thread;
+    pthread_t _thread;
 
     static void *threadLauncher(void *arg);
     virtual void threadRoutine() =0;

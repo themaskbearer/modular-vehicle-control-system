@@ -9,14 +9,14 @@
 
 #include "utils/Exceptions.h"
 
-Thread::Thread() : m_thread(-1)
+Thread::Thread() : _thread(-1)
 {
 
 }
 
 Thread::~Thread()
 {
-    pthread_cancel(m_thread);
+    pthread_cancel(_thread);
 }
 
 void *Thread::threadLauncher(void* arg)
@@ -27,8 +27,8 @@ void *Thread::threadLauncher(void* arg)
 
 void Thread::startThread()
 {
-    int result = pthread_create(&m_thread, NULL, &threadLauncher, this);
+    int result = pthread_create(&_thread, NULL, &threadLauncher, this);
 
     if(result)
-        throw Exception("Could not launch m_thread", result);
+        throw Exception("Could not launch _thread", result);
 }

@@ -18,14 +18,14 @@ typedef std::vector<Memory> MemoryStorage;
 class MovementController
 {
 public:
-    MovementController(MemoryStorage* memories) : m_memories(memories) {}
+    MovementController(MemoryStorage* memories) : _memories(memories) {}
     virtual ~MovementController() {}
 
     virtual VehicleCommand getCommandToExecute(const State& currentTarget, const State& currentState) =0;
     virtual void processCommandResults(const State& finalState) =0;
 
 protected:
-    MemoryStorage* m_memories;
+    MemoryStorage* _memories;
 };
 
 #endif /* SRC_MOVEMENTCONTROLLER_H_ */

@@ -35,7 +35,7 @@ public:
     SensorData getSensorData();
 
 private:
-    int m_device;
+    int _device;
 
     void initialize();
 

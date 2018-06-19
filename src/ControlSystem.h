@@ -24,11 +24,11 @@ public:
     void stop();
 
 private:
-    ConfigurationLearner m_learner;
-    PathPlanner m_planner;
-    AIEngine m_controller;
+    ConfigurationLearner _learner;
+    PathPlanner _planner;
+    AIEngine _controller;
 
-    MemoryStorage m_memories;
+    MemoryStorage _memories;
 
     void threadRoutine();
     void runMovement(MovementController* controller);

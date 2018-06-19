@@ -28,12 +28,12 @@ I2cHandler::I2cHandler()
 
 I2cHandler::~I2cHandler()
 {
-    close(m_device);
+    close(_device);
 }
 
 void I2cHandler::initialize()
 {
-    m_device = open("/dev/i2c-3", O_RDWR);
+    _device = open("/dev/i2c-3", O_RDWR);
 
     try
     {
@@ -65,7 +65,7 @@ void I2cHandler::initialize()
 
 void I2cHandler::writeI2C(unsigned char* buffer, int bytestowrite)
 {
-    int byteswriten = write(m_device, buffer, bytestowrite);
+    int byteswriten = write(_device, buffer, bytestowrite);
 
     if(byteswriten != bytestowrite)
         throw Exception("Failed to write to I2C bus", errno);
@@ -75,7 +75,7 @@ void I2cHandler::writeI2C(unsigned char* buffer, int bytestowrite)
 
 void I2cHandler::writeAccel(unsigned char* buffer, int bytestowrite)
 {
-    int error = ioctl(m_device, I2C_SLAVE_FORCE, ACCEL_ADDR);
+    int error = ioctl(_device, I2C_SLAVE_FORCE, ACCEL_ADDR);
 
     if(error < 0)
         throw Exception("Failed set ioctl for writing Accelerometer", errno);
@@ -86,7 +86,7 @@ void I2cHandler::writeAccel(unsigned char* buffer, int bytestowrite)
 
 void I2cHandler::writeComp(unsigned char* buffer, int bytestowrite)
 {
-    int error = ioctl(m_device, I2C_SLAVE_FORCE, COMP_ADDR);
+    int error = ioctl(_device, I2C_SLAVE_FORCE, COMP_ADDR);
 
     if(error < 0)
         throw Exception("Failed set ioctl for writing Compass", errno);
@@ -96,7 +96,7 @@ void I2cHandler::writeComp(unsigned char* buffer, int bytestowrite)
 
 void I2cHandler::writeGyro(unsigned char* buffer, int bytestowrite)
 {
-    int error = ioctl(m_device, I2C_SLAVE_FORCE, GYRO_ADDR);
+    int error = ioctl(_device, I2C_SLAVE_FORCE, GYRO_ADDR);
 
     if(error < 0)
         throw Exception("Failed to set ioctl for writing Gyro", errno);
@@ -108,7 +108,7 @@ void I2cHandler::readI2C(unsigned char* buffer, int bytestoread)
 {
     writeI2C(buffer, 1);
 
-    int bytesread = read(m_device, &buffer[1], bytestoread);
+    int bytesread = read(_device, &buffer[1], bytestoread);
 
     if(bytesread != bytestoread)
         throw Exception("Failed to read bytes from I2C", errno);
@@ -118,7 +118,7 @@ void I2cHandler::readI2C(unsigned char* buffer, int bytestoread)
 
 void I2cHandler::readAccel(unsigned char* buffer, int bytestoread)
 {
-    int error = ioctl(m_device, I2C_SLAVE_FORCE, ACCEL_ADDR);
+    int error = ioctl(_device, I2C_SLAVE_FORCE, ACCEL_ADDR);
 
     if(error < 0)
         throw Exception("Failed to set ioctl for reading Accelerometer", errno);
@@ -129,7 +129,7 @@ void I2cHandler::readAccel(unsigned char* buffer, int bytestoread)
 
 void I2cHandler::readComp(unsigned char* buffer, int bytestoread)
 {
-    int error = ioctl(m_device, I2C_SLAVE_FORCE, COMP_ADDR);
+    int error = ioctl(_device, I2C_SLAVE_FORCE, COMP_ADDR);
 
     if(error < 0)
         throw Exception("Failed to set ioctl for reading Compass", errno);
@@ -139,7 +139,7 @@ void I2cHandler::readComp(unsigned char* buffer, int bytestoread)
 
 void I2cHandler::readGyro(unsigned char* buffer, int bytestoread)
 {
-    int error = ioctl(m_device, I2C_SLAVE_FORCE, GYRO_ADDR);
+    int error = ioctl(_device, I2C_SLAVE_FORCE, GYRO_ADDR);
 
     if(error < 0)
         throw Exception("Failed to set ioctl for reading Gyro", errno);

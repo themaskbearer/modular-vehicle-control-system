@@ -8,13 +8,13 @@
 #include "thread/LockGuard.h"
 
 LockGuard::LockGuard(Mutex& mutex) :
-        m_mutex(mutex)
+        _mutex(mutex)
 {
-    m_mutex.lock();
+    _mutex.lock();
 }
 
 LockGuard::~LockGuard()
 {
-    m_mutex.unlock();
+    _mutex.unlock();
 }
 
