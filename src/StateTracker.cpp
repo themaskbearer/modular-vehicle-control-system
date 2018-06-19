@@ -6,6 +6,7 @@
  */
 
 #include "StateTracker.h"
+#include "utils/MatrixOperations.h"
 #include "utils/ErrorHandler.h"
 #include "thread/LockGuard.h"
 
@@ -70,8 +71,8 @@ void StateTracker::initializeOrientation()
     float b = asin(-(float)Initial.Accelerometer.X/GMAG);
     float a = 0;
 
-    std::vector<float> temp = createRotationMatrix(a, b, g);
-    _R = multiplyRMatrix(_R, temp);
+    matrix::Matrix temp = matrix::createRotationMatrix(a, b, g);
+    _R = matrix::multiplyRMatrix(_R, temp);
 
 //    CurrentState.RPY.pitch = g;
 //    CurrentState.RPY.roll = b;
@@ -100,8 +101,8 @@ void StateTracker::updateState(SensorData data)
     // Creates the rotation matrix for the amount of rotation that has occured during the last timestep
     // It then takes this rotation and multiplies it against the global frame to update the global
     // position and orientation of the vehicle
-    std::vector<float> latestRelativeRotation = createRotationMatrix(a, b, g);
-    _R = multiplyRMatrix(_R, latestRelativeRotation);
+    matrix::Matrix latestRelativeRotation = matrix::createRotationMatrix(a, b, g);
+    _R = matrix::multiplyRMatrix(_R, latestRelativeRotation);
 
     // Given the vehicle's current global orientation, calculate the amount of gravity that should be measured
     // by the accelerometer along its X, Y, and Z axes.  GMAG is in sensor units (mGs or milli-Gs)
@@ -114,14 +115,14 @@ void StateTracker::updateState(SensorData data)
     _currentState._acceleration.y = data.Accelerometer.Y - yg;
     _currentState._acceleration.z = data.Accelerometer.Z - zg;
 
-    std::vector<float> p(3, 0);
+    matrix::Matrix p(3, 0);
 
     p[0] = _currentState._acceleration.x;
     p[1] = _currentState._acceleration.y;
     p[2] = _currentState._acceleration.z;
 
     // Convert the acceleration measured in the vehicle's coordinate frame to the global coordinate frame
-    p = multiplyPosition(_R, p);
+    p = matrix::multiplyPosition(_R, p);
 
     _currentState._acceleration.x = p[0];
     _currentState._acceleration.y = p[1];
@@ -198,51 +199,6 @@ void StateTracker::updateState(SensorData data)
         LockGuard guard(_access);
         _lastState = _currentState;
     }
-}
-
-
-std::vector<float> StateTracker::createRotationMatrix(float a, float b, float g)
-{
-    std::vector<float> R;
-
-    R.push_back(cos(a)*cos(b));
-    R.push_back(cos(a)*sin(b)*sin(g) - sin(a)*cos(g));
-    R.push_back(cos(a)*sin(b)*cos(g) + sin(a)*sin(g));
-
-    R.push_back(sin(a)*cos(b));
-    R.push_back(sin(a)*sin(b)*sin(g) + cos(a)*cos(g));
-    R.push_back(sin(a)*sin(b)*cos(g) - cos(a)*sin(g));
-
-    R.push_back(-sin(b));
-    R.push_back(cos(b)*sin(g));
-    R.push_back(cos(b)*cos(g));
-
-    return R;
-}
-
-
-std::vector<float> StateTracker::multiplyRMatrix(std::vector<float> R, std::vector<float> Rb)
-{
-    std::vector<float> ReturnedMatrix(9, 0);
-
-    for(int i = 0; i < 3; i++)
-        for(int j = 0; j < 3; j++)
-            for(int k = 0; k < 3; k++)
-                ReturnedMatrix[i*3 + j] += R[i*3 + k] * Rb[j + k*3];
-
-    return ReturnedMatrix;
-}
-
-
-std::vector<float> StateTracker::multiplyPosition(std::vector<float> R, std::vector<float> p)
-{
-    std::vector<float> ReturnedMatrix(3, 0);
-
-    for(int i = 0; i < 3; i++)
-        for(int j = 0; j < 3; j++)
-            ReturnedMatrix[i] += R[i*3 + j] * p[j];
-
-    return ReturnedMatrix;
 }
 
 

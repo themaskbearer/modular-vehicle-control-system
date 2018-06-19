@@ -55,10 +55,6 @@ private:
     void threadRoutine();
     void initializeOrientation();
 
-    std::vector<float> createRotationMatrix(float a, float b, float g);
-    std::vector<float> multiplyRMatrix(std::vector<float> R, std::vector<float> Rb);
-    std::vector<float> multiplyPosition(std::vector<float> R, std::vector<float> p);
-
     void updateState(SensorData data);
 };
 

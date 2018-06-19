@@ -11,6 +11,7 @@
 #include "thread/Thread.h"
 #include "MovementController.h"
 #include "Memory.h"
+#include "utils/MatrixOperations.h"
 #include <vector>
 
 class AIEngine : public MovementController
@@ -25,13 +26,17 @@ public:
 private:
     State _currentMoveInitialState;
     State _currentMovePrediction;
+    matrix::Matrix _currentR;
     Memory* _currentActingMemory = nullptr;
 
-    Memory* getBestMemory(const State& Target);
+    Memory* getBestMemory(const State& target);
 
+    float evaluateMemory(const Memory& memory, const State& target);
     float compareStates(const State& state1, const State& state2);
 
     void logState(const std::string& title, const State& state);
+
+    void correctPosition(AxesProjection& displacement);
 };
 
 #endif /* AIENGINE_H_ */

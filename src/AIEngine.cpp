@@ -28,6 +28,9 @@ VehicleCommand AIEngine::getCommandToExecute(const State& currentTarget, const S
     DATA_LOGGER->recordData("\n-----------New iteration---------------");
 
     _currentMoveInitialState = currentState;
+    _currentR = matrix::createRotationMatrix(_currentMoveInitialState._angPosition.yaw,
+                                             _currentMoveInitialState._angPosition.roll,
+                                             _currentMoveInitialState._angPosition.pitch);
     State poseDifference = currentTarget - currentState;
     logState("current pose: ", currentState);
     logState("target: ", currentTarget);
@@ -37,6 +40,7 @@ VehicleCommand AIEngine::getCommandToExecute(const State& currentTarget, const S
     DATA_LOGGER->recordData("chosen memory: " + _currentActingMemory->to_str());
 
     _currentMovePrediction = _currentActingMemory->_final - _currentActingMemory->_initial;
+    correctPosition(_currentMovePrediction._displacement);
     logState("prediction: ", _currentMovePrediction);
 
     return _currentActingMemory->_command;
@@ -94,7 +98,7 @@ void AIEngine::processCommandResults(const State& finalState)
 }
 
 
-Memory* AIEngine::getBestMemory(const State& Target)
+Memory* AIEngine::getBestMemory(const State& target)
 {
     int seed = rand() % 100 / _memories->size();
     auto ReturnedMemory = _memories->begin();
@@ -103,15 +107,12 @@ Memory* AIEngine::getBestMemory(const State& Target)
         ReturnedMemory++;
 
     // Set initial pose error and memory
-    State diff = ReturnedMemory->_final - ReturnedMemory->_initial;
-    float maxPoseError = compareStates(diff, Target);
+    float maxPoseError = evaluateMemory(*ReturnedMemory, target);
 
     // TODO: Fix this too
     for(auto iter = _memories->begin(); iter != _memories->end(); ++iter)
     {
-        diff = iter->_final - iter->_initial;
-        float poseError = compareStates(diff, Target);
-
+        float poseError = evaluateMemory(*iter, target);
         if(poseError < maxPoseError && iter->_confidence >= ReturnedMemory->_confidence)
         {
             maxPoseError = poseError;
@@ -120,6 +121,31 @@ Memory* AIEngine::getBestMemory(const State& Target)
     }
 
     return &(*ReturnedMemory);
+}
+
+
+float AIEngine::evaluateMemory(const Memory& memory, const State& target)
+{
+    State diff = memory._final - memory._initial;
+    correctPosition(diff._displacement);
+
+    float poseError = compareStates(diff, target);
+    return poseError;
+}
+
+
+void AIEngine::correctPosition(AxesProjection& displacement)
+{
+    matrix::Matrix position;
+    position.push_back(displacement.x);
+    position.push_back(displacement.y);
+    position.push_back(displacement.z);
+
+    position = matrix::multiplyPosition(_currentR, position);
+
+    displacement.x = position[0];
+    displacement.y = position[1];
+    displacement.z = position[2];
 }
 
 
