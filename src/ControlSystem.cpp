@@ -6,12 +6,15 @@
  */
 
 #include "ControlSystem.h"
+#include "paths/SimplePath.h"
 
 ControlSystem::ControlSystem(std::shared_ptr<Vehicle> vehicle) :
     Supervisor(vehicle),
     _learner(vehicle->getNumberOfMotors(), &_memories),
+    _planner(new SimplePath()),
     _controller(&_memories)
 {
+
 }
 
 
@@ -49,8 +52,8 @@ void ControlSystem::threadRoutine()
 void ControlSystem::runMovement(MovementController* controller)
 {
     State currentState = _vehicle->getPose();
-    _planner.updateTarget(currentState);
-    State currentTarget = _planner.getTarget();
+    _planner->updateTarget(currentState);
+    State currentTarget = _planner->getTarget();
 
     VehicleCommand command = controller->getCommandToExecute(currentTarget, currentState);
     _vehicle->runCommand(command);

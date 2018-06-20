@@ -13,6 +13,7 @@
 #include "AIEngine.h"
 #include "ConfigurationLearner.h"
 #include "PathPlanner.h"
+#include <memory>
 
 class ControlSystem : public Supervisor, Thread
 {
@@ -25,7 +26,7 @@ public:
 
 private:
     ConfigurationLearner _learner;
-    PathPlanner _planner;
+    std::unique_ptr<PathPlanner> _planner;
     AIEngine _controller;
 
     MemoryStorage _memories;

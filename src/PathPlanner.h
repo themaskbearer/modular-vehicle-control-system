@@ -4,25 +4,19 @@
 
 #include "Memory.h"
 
-#include <vector>
-using std::vector;
-using std::iterator;
 
 class PathPlanner
 {
 
 public:
-    PathPlanner(void);
-    ~PathPlanner(void);
+    PathPlanner(void) {}
+    virtual ~PathPlanner(void) {}
 
-    State getTarget();
-    void updateTarget(State CurrentState);
+    const State& getTarget() { return _currentTarget; }
+    virtual void updateTarget(const State& CurrentState) =0;
 
-private:
-    const float ERROR_THRESHOLD = 0.2;
-
-    vector<State> _locations;
-    vector<State>::iterator _currentTarget;
+protected:
+    State _currentTarget;
 };
 
 #endif //PATHPLANNER
