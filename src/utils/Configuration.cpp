@@ -22,6 +22,16 @@ Configuration::~Configuration()
 }
 
 
+bool Configuration::isValueSet(const std::string& key)
+{
+    auto data_pair = _config.find(key);
+    if(data_pair != _config.end())
+        return true;
+    else
+        return false;
+}
+
+
 std::string Configuration::getValue(const std::string& key)
 {
     LockGuard guard(_lock);
