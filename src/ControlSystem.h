@@ -11,7 +11,7 @@
 #include "Supervisor.h"
 #include "MovementController.h"
 #include "AIEngine.h"
-#include "ConfigurationLearner.h"
+#include "LearningBehavior.h"
 #include "PathPlanner.h"
 
 class ControlSystem : public Supervisor, Thread
@@ -24,7 +24,7 @@ public:
     void stop();
 
 private:
-    ConfigurationLearner _learner;
+    LearningBehavior _learner;
     PathPlanner _planner;
     AIEngine _controller;
 

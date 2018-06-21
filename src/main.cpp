@@ -6,17 +6,18 @@
 #include "AUV.h"
 
 
-int main()
+int main(int argc, char** argv)
 {
-        // Since the GPIO are not in the correct state on power on, this allows for final configuration
-        // of the vehicle before deployment where the motors aren't turning
-        //usleep(300000000); // 5 mins
+    if(argc > 1)
+    {
+        std::cout << "Woo arguments!" << std::endl;
+    }
 
-        AUV auv;
+    AUV auv;
 
-        auv.initialize();
-        auv.run();
-        auv.shutdown();
+    auv.initialize();
+    auv.run();
+    auv.shutdown();
 
-        return 0;
+    return 0;
 }
