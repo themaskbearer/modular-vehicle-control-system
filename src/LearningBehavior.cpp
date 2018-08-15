@@ -5,11 +5,11 @@
  *      Author: jpollard
  */
 
-#include "ConfigurationLearner.h"
+#include "LearningBehavior.h"
 #include "utils/DataLogger.h"
 #include <cmath>
 
-ConfigurationLearner::ConfigurationLearner(unsigned int numOfMotors, MemoryStorage* memories) :
+LearningBehavior::LearningBehavior(unsigned int numOfMotors, MemoryStorage* memories) :
     MovementController(memories),
     _numOfMotors(numOfMotors)
 {
@@ -21,7 +21,7 @@ ConfigurationLearner::ConfigurationLearner(unsigned int numOfMotors, MemoryStora
 }
 
 
-void ConfigurationLearner::addMotorDirectionCombinations(unsigned int motorsUsedMask)
+void LearningBehavior::addMotorDirectionCombinations(unsigned int motorsUsedMask)
 {
     for(unsigned int motorDirectionMask = 0; motorDirectionMask <= motorsUsedMask; ++motorDirectionMask)
     {
@@ -34,7 +34,7 @@ void ConfigurationLearner::addMotorDirectionCombinations(unsigned int motorsUsed
 }
 
 
-void ConfigurationLearner::addDurationVariations(unsigned int motorsUsedMask, unsigned int motorDirectionMask)
+void LearningBehavior::addDurationVariations(unsigned int motorsUsedMask, unsigned int motorDirectionMask)
 {
     static std::vector<int> secondsToRun = {2, 4, 6};
 
@@ -47,13 +47,13 @@ void ConfigurationLearner::addDurationVariations(unsigned int motorsUsedMask, un
 }
 
 
-ConfigurationLearner::~ConfigurationLearner()
+LearningBehavior::~LearningBehavior()
 {
 
 }
 
 
-VehicleCommand ConfigurationLearner::getCommandToExecute(const State& currentTarget, const State& currentState)
+VehicleCommand LearningBehavior::getCommandToExecute(const State& currentTarget, const State& currentState)
 {
     VehicleCommand command;
 
@@ -73,7 +73,7 @@ VehicleCommand ConfigurationLearner::getCommandToExecute(const State& currentTar
 }
 
 
-void ConfigurationLearner::processCommandResults(const State& finalState)
+void LearningBehavior::processCommandResults(const State& finalState)
 {
     if(!isLearningComplete())
     {

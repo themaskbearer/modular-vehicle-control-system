@@ -12,11 +12,11 @@
 #include "Memory.h"
 #include <vector>
 
-class ConfigurationLearner : public MovementController
+class LearningBehavior : public MovementController
 {
 public:
-    ConfigurationLearner(unsigned int numOfMotors, MemoryStorage* memories);
-    virtual ~ConfigurationLearner();
+    LearningBehavior(unsigned int numOfMotors, MemoryStorage* memories);
+    virtual ~LearningBehavior();
 
     VehicleCommand getCommandToExecute(const State& currentTarget, const State& currentState);
     void processCommandResults(const State& finalState);

@@ -11,6 +11,10 @@
 
 TestPlatform::TestPlatform()
 {
+    // Since the GPIO are not in the correct state on power on, this allows for final configuration
+    // of the vehicle before deployment where the motors aren't turning
+    usleep(300000000); // 5 mins
+
     _motors.push_back(Motor(MOTOR1DIR, MOTOR1EN));
     _motors.push_back(Motor(MOTOR2DIR, MOTOR2EN));
     //Motors.push_back(Motor(MOTOR3DIR, MOTOR3EN));
