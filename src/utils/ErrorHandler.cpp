@@ -11,7 +11,7 @@
 #include <iostream>
 
 
-ErrorHandler* ErrorHandler::_instance = nullptr;
+template<> ErrorHandler* Singleton<ErrorHandler>::_instance = nullptr;
 
 
 ErrorHandler::ErrorHandler()

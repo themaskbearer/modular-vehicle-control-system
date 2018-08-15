@@ -12,17 +12,18 @@
 #include <string>
 #include <queue>
 
+#include "utils/Singleton.h"
 #include "Exceptions.h"
 #include "thread/Thread.h"
 #include "thread/Mutex.h"
 
 
-class ErrorHandler : public Thread
+class ErrorHandler : public Thread, public Singleton<ErrorHandler>
 {
+    friend class Singleton<ErrorHandler>;
+
 public:
     virtual ~ErrorHandler();
-
-    static ErrorHandler* instance() { if(_instance == nullptr) _instance = new ErrorHandler(); return _instance; }
 
     void initialize(const std::string& filePath);
     void close();
@@ -31,7 +32,6 @@ public:
 
 private:
     ErrorHandler();
-    static ErrorHandler* _instance;
 
     bool _initialized = false;
 

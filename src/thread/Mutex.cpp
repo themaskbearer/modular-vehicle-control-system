@@ -21,7 +21,7 @@ Mutex::~Mutex()
 {
     int error = pthread_mutex_destroy(&_mutex);
     if(error)
-        ERROR_HANDLER->recordError(Exception("Failed to destroy mutex", errno));
+        ERROR_HANDLER.recordError(Exception("Failed to destroy mutex", errno));
 }
 
 

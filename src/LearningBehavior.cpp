@@ -81,7 +81,7 @@ void LearningBehavior::processCommandResults(const State& finalState)
         currentMemory._confidence = INITIAL_CONFIDENCE;
         _memories->push_back(currentMemory);
 
-        DATA_LOGGER->recordData("New Memory:\n" + currentMemory.to_str());
+        DATA_LOGGER.recordData("New Memory:\n" + currentMemory.to_str());
 
         ++_learningIndex;
     }

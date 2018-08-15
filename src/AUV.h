@@ -18,7 +18,6 @@ public:
     AUV();
     ~AUV();
 
-    void initialize();
     void run();
     void shutdown();
 

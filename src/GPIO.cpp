@@ -45,9 +45,9 @@ void GPIO::initialize(std::string gpioNumber)
         _direction.open((_location + "/direction").c_str());
 
         if(!_value.is_open())
-            ERROR_HANDLER->recordError(Exception("failed to open " + _location + " value file"));
+            ERROR_HANDLER.recordError(Exception("failed to open " + _location + " value file"));
         else if(!_direction.is_open())
-            ERROR_HANDLER->recordError(Exception("failed to open " + _location + " direction file"));
+            ERROR_HANDLER.recordError(Exception("failed to open " + _location + " direction file"));
         else
             _initialized = true;
     }
@@ -63,7 +63,7 @@ void GPIO::initialize144()
     _value.open((_location + "/value").c_str());
 
     if(!_value.is_open())
-        ERROR_HANDLER->recordError(Exception("failed to open " + _location + " value file"));
+        ERROR_HANDLER.recordError(Exception("failed to open " + _location + " value file"));
     else
         _initialized = true;
 }

@@ -25,7 +25,7 @@ AIEngine::~AIEngine()
 
 VehicleCommand AIEngine::getCommandToExecute(const State& currentTarget, const State& currentState)
 {
-    DATA_LOGGER->recordData("\n-----------New iteration---------------");
+    DATA_LOGGER.recordData("\n-----------New iteration---------------");
 
     _currentMoveInitialState = currentState;
     _currentR = matrix::createRotationMatrix(_currentMoveInitialState._angPosition.yaw,
@@ -37,7 +37,7 @@ VehicleCommand AIEngine::getCommandToExecute(const State& currentTarget, const S
     logState("diff: ", poseDifference);
 
     _currentActingMemory = getBestMemory(poseDifference);
-    DATA_LOGGER->recordData("chosen memory: " + _currentActingMemory->to_str());
+    DATA_LOGGER.recordData("chosen memory: " + _currentActingMemory->to_str());
 
     _currentMovePrediction = _currentActingMemory->_final - _currentActingMemory->_initial;
     correctPosition(_currentMovePrediction._displacement);
@@ -56,7 +56,7 @@ void AIEngine::processCommandResults(const State& finalState)
 
     std::string logstring = "error= ";
     logstring = logstring + movementError;
-    DATA_LOGGER->recordData(logstring);
+    DATA_LOGGER.recordData(logstring);
 
 //    if (movementError <= ideal && movementError > (0.5 * ideal))
 //    {
@@ -64,7 +64,7 @@ void AIEngine::processCommandResults(const State& finalState)
 //        if (_currentActingMemory->_confidence > 100)
 //            _currentActingMemory->_confidence = 100;
 //
-//        DATA_LOGGER->recordData("memory correct");
+//        DATA_LOGGER.recordData("memory correct");
 //    }
 //    else
 //    {
@@ -81,7 +81,7 @@ void AIEngine::processCommandResults(const State& finalState)
 //            if (_currentActingMemory->_confidence < 0)
 //                _currentActingMemory->_confidence = 0;
 //
-//            DATA_LOGGER->recordData("found better memory, adjusting");
+//            DATA_LOGGER.recordData("found better memory, adjusting");
 //        }
 //        else if (newopt <= movementError)
 //        {
@@ -92,7 +92,7 @@ void AIEngine::processCommandResults(const State& finalState)
 //            if (_currentActingMemory->_confidence < 0)
 //                _currentActingMemory->_confidence = 0;
 //
-//            DATA_LOGGER->recordData("Adjusting memory");
+//            DATA_LOGGER.recordData("Adjusting memory");
 //        }
 //    }
 }
@@ -169,5 +169,5 @@ void AIEngine::logState(const std::string& title, const State& state)
     logstring = logstring + state._displacement.x + " " + state._displacement.y + " " + state._displacement.z + " "
             + state._angPosition.roll + " " + state._angPosition.pitch + " " + state._angPosition.yaw;
 
-    DATA_LOGGER->recordData(logstring);
+    DATA_LOGGER.recordData(logstring);
 }

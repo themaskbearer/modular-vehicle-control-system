@@ -8,34 +8,20 @@
 #include "AUV.h"
 #include "SimulatedVehicle.h"
 #include "ControlSystem.h"
-#include "utils/DataLogger.h"
-#include "utils/ErrorHandler.h"
 
 
 
 AUV::AUV()
 {
-
+    // TODO: add switch depending on configuration which vehicle to use
+    _vehicle = std::make_shared<SimulatedVehicle>();
+    _supervisor.reset(new ControlSystem(_vehicle));
 }
 
 
 AUV::~AUV()
 {
 
-}
-
-
-void AUV::initialize()
-{
-    ERROR_HANDLER->initialize("errors.log");
-    ERROR_HANDLER->startThread();
-
-    DATA_LOGGER->initialize();
-    DATA_LOGGER->startThread();
-
-    // TODO: add switch depending on configuration which vehicle to use
-    _vehicle.reset(new SimulatedVehicle());
-    _supervisor.reset(new ControlSystem(_vehicle));
 }
 
 
@@ -51,6 +37,5 @@ void AUV::run()
 
 void AUV::shutdown()
 {
-    DATA_LOGGER->close();
-    ERROR_HANDLER->close();
+
 }

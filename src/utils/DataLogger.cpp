@@ -12,7 +12,7 @@
 #include <iostream>
 
 
-DataLogger* DataLogger::_instance = nullptr;
+template<> DataLogger* Singleton<DataLogger>::_instance = nullptr;
 
 
 DataLogger::DataLogger()
@@ -32,17 +32,17 @@ void DataLogger::initialize()
 {
     _dataFile.open("data.log", std::istream::app);
     if(!_dataFile.is_open())
-        ERROR_HANDLER->recordError(Exception("Can't open data file log...\n"));
+        ERROR_HANDLER.recordError(Exception("Can't open data file log...\n"));
     else
         _dataFile << "\n\n\nNEW SESSION\n";
 
     _accelFile.open("accel.dat", std::istream::app);
     if(!_accelFile.is_open())
-        ERROR_HANDLER->recordError(Exception("Can't open accel file log...\n"));
+        ERROR_HANDLER.recordError(Exception("Can't open accel file log...\n"));
 
     _senseFile.open("sense.dat", std::istream::app);
     if(!_senseFile.is_open())
-        ERROR_HANDLER->recordError(Exception("Can't open sense file log...\n"));
+        ERROR_HANDLER.recordError(Exception("Can't open sense file log...\n"));
 
     _initialized = true;
 }

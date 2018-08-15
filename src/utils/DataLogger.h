@@ -16,13 +16,14 @@
 #include "thread/Thread.h"
 #include "thread/Mutex.h"
 #include "OperatorFunctions.h"
+#include "utils/Singleton.h"
 
-class DataLogger : public Thread
+class DataLogger : public Thread, public Singleton<DataLogger>
 {
+    friend class Singleton<DataLogger>;
+
 public:
     virtual ~DataLogger();
-
-    static DataLogger* instance() { if(_instance == nullptr) _instance = new DataLogger(); return _instance; }
 
     void initialize();
     void close();
@@ -32,9 +33,7 @@ public:
     void recordSense(std::string data);
 
 private:
-    static DataLogger* _instance;
     DataLogger();
-
     bool _initialized = false;
 
     Mutex _access;

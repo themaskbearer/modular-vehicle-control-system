@@ -58,7 +58,7 @@ void I2cHandler::initialize()
     }
     catch(Exception& e)
     {
-        ERROR_HANDLER->recordError(Exception("Failed to initialize device: "+ e.getMessage(), e.getErrorValue()));
+        ERROR_HANDLER.recordError(Exception("Failed to initialize device: "+ e.getMessage(), e.getErrorValue()));
         throw e;
     }
 }
@@ -161,7 +161,7 @@ SensorData I2cHandler::getSensorData()
     }
     catch(Exception& e)
     {
-        ERROR_HANDLER->recordError(e);
+        ERROR_HANDLER.recordError(e);
 
         for(int i = 0; i < 7; i++)
             data[i] = 0;
@@ -177,7 +177,7 @@ SensorData I2cHandler::getSensorData()
     }
     catch(Exception& e)
     {
-        ERROR_HANDLER->recordError(e);
+        ERROR_HANDLER.recordError(e);
 
         for(int i = 0; i < 7; i++)
             data[i] = 0;
