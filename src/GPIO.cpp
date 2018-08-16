@@ -5,51 +5,30 @@
  *      Author: jpollard
  */
 
+#include "utils/ErrorLogger.h"
 #include "GPIO.h"
-#include "utils/ErrorHandler.h"
 #include "thread/LockGuard.h"
 
 #include <cstdlib>
 
-GPIO::GPIO()
+GPIO::GPIO(unsigned int gpioNumber)
 {
-}
-
-
-GPIO::GPIO(const GPIO& old)
-{
-}
-
-
-GPIO::~GPIO()
-{
-    if(_value.is_open())
-        _value.close();
-
-    if(_direction.is_open())
-        _direction.close();
-}
-
-
-void GPIO::initialize(std::string gpioNumber)
-{
-    LockGuard guard(_access);
-
-    if(gpioNumber == "144")
+    if(gpioNumber == 144)
         initialize144();
     else
     {
         _location = "/sys/class/gpio/gpio" + gpioNumber;
         _value.open((_location + "/value").c_str());
+        if(!_value.is_open()) {
+            ERROR_LOGGER.recordError("failed to open " + _location + " value file");
+            throw FileOpenFailure(_location + "/value");
+        }
 
         _direction.open((_location + "/direction").c_str());
-
-        if(!_value.is_open())
-            ERROR_HANDLER.recordError(Exception("failed to open " + _location + " value file"));
-        else if(!_direction.is_open())
-            ERROR_HANDLER.recordError(Exception("failed to open " + _location + " direction file"));
-        else
-            _initialized = true;
+        if(!_direction.is_open()) {
+            ERROR_LOGGER.recordError("failed to open " + _location + " direction file");
+            throw FileOpenFailure(_location + "/direction");
+        }
     }
 }
 
@@ -62,22 +41,27 @@ void GPIO::initialize144()
     _location += "144";
     _value.open((_location + "/value").c_str());
 
-    if(!_value.is_open())
-        ERROR_HANDLER.recordError(Exception("failed to open " + _location + " value file"));
-    else
-        _initialized = true;
+    if(!_value.is_open()) {
+        ERROR_LOGGER.recordError("failed to open " + _location + " value file");
+        throw FileOpenFailure(_location + "/value");
+    }
+}
+
+
+GPIO::~GPIO()
+{
+    _value.close();
+    _direction.close();
 }
 
 
 void GPIO::makeInput()
 {
+    // GPIO 144's direction is unable to be changed, so no-op
     if(_is144)
         return;
 
     LockGuard guard(_access);
-
-    if(!_initialized)
-        throw Exception("Gpio " + _location + " not intialized");
 
     std::string str = "echo in > ";
     str += _location;
@@ -88,13 +72,11 @@ void GPIO::makeInput()
 
 void GPIO::makeOutput()
 {
+    // GPIO 144's direction is unable to be changed, so no-op
     if(_is144)
         return;
 
     LockGuard guard(_access);
-
-    if(!_initialized)
-        throw Exception("Gpio " + _location + " not intialized");
 
     std::string str = "echo out > ";
     str += _location;
@@ -106,9 +88,6 @@ void GPIO::makeOutput()
 void GPIO::setState(int state)
 {
     LockGuard guard(_access);
-
-    if(!_initialized)
-        throw Exception("Gpio " + _location + " not intialized");
 
     if(state == 0)
     {

@@ -14,12 +14,12 @@
 #include <iostream>
 #include <cstdlib>
 #include <errno.h>
-
 #include <algorithm>
 
 #include "I2Caddresses.h"
-#include "utils/ErrorHandler.h"
 #include "utils/Exceptions.h"
+#include "utils/ErrorLogger.h"
+#include "utils/OperatorFunctions.h"
 
 I2cHandler::I2cHandler()
 {
@@ -56,9 +56,9 @@ void I2cHandler::initialize()
         writeGyro(&gyroreg[2], 2);
         writeGyro(&gyroreg[4], 2);
     }
-    catch(Exception& e)
+    catch(const Exception& e)
     {
-        ERROR_HANDLER.recordError(Exception("Failed to initialize device: "+ e.getMessage(), e.getErrorValue()));
+        ERROR_LOGGER.recordError("Failed to initialize device: " + e.getMessage() + ", " + e.getErrorValue());
         throw e;
     }
 }
@@ -161,7 +161,7 @@ SensorData I2cHandler::getSensorData()
     }
     catch(Exception& e)
     {
-        ERROR_HANDLER.recordError(e);
+        ERROR_LOGGER.recordError(e.what());
 
         for(int i = 0; i < 7; i++)
             data[i] = 0;
@@ -177,7 +177,7 @@ SensorData I2cHandler::getSensorData()
     }
     catch(Exception& e)
     {
-        ERROR_HANDLER.recordError(e);
+        ERROR_LOGGER.recordError(e.what());
 
         for(int i = 0; i < 7; i++)
             data[i] = 0;

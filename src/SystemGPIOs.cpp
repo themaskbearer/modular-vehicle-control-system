@@ -11,26 +11,17 @@ Author: jpollard
 #include "MotorConstants.h"
 
 
-SystemGPIOs* SystemGPIOs::_instance = nullptr;
+template<> SystemGPIOs::Ptr Singleton<SystemGPIOs>::_instance = nullptr;
 
 
 SystemGPIOs::SystemGPIOs()
 {
-    GPIOS.clear();
-
-    GPIOS.insert(pair<int, GPIO>(MOTOR1DIR, GPIO()));
-    GPIOS.insert(pair<int, GPIO>(MOTOR1EN, GPIO()));
-    GPIOS.insert(pair<int, GPIO>(MOTOR2DIR, GPIO()));
-    GPIOS.insert(pair<int, GPIO>(MOTOR2EN, GPIO()));
-    GPIOS.insert(pair<int, GPIO>(MOTOR3DIR, GPIO()));
-    GPIOS.insert(pair<int, GPIO>(MOTOR3EN, GPIO()));
-
-    GPIOS.find(MOTOR1DIR)->second.initialize("144");
-    GPIOS.find(MOTOR1EN)->second.initialize("174");
-    GPIOS.find(MOTOR2DIR)->second.initialize("173");
-    GPIOS.find(MOTOR2EN)->second.initialize("175");
-    GPIOS.find(MOTOR3DIR)->second.initialize("147");
-    GPIOS.find(MOTOR3EN)->second.initialize("172");
+    GPIOS.insert(pair<int, GPIO::Ptr>(MOTOR1DIR, std::make_shared<GPIO>(144)));
+    GPIOS.insert(pair<int, GPIO::Ptr>(MOTOR1EN,std::make_shared<GPIO>(174)));
+    GPIOS.insert(pair<int, GPIO::Ptr>(MOTOR2DIR, std::make_shared<GPIO>(173)));
+    GPIOS.insert(pair<int, GPIO::Ptr>(MOTOR2EN, std::make_shared<GPIO>(175)));
+    GPIOS.insert(pair<int, GPIO::Ptr>(MOTOR3DIR, std::make_shared<GPIO>(147)));
+    GPIOS.insert(pair<int, GPIO::Ptr>(MOTOR3EN, std::make_shared<GPIO>(172)));
 }
 
 
@@ -39,12 +30,12 @@ SystemGPIOs::~SystemGPIOs()
 }
 
 
-GPIO* SystemGPIOs::getGPIO(int gpioNumber)
+GPIO::Ptr SystemGPIOs::getGPIO(int gpioNumber)
 {
-    map<int, GPIO>::iterator iter = GPIOS.find(gpioNumber);
+    auto iter = GPIOS.find(gpioNumber);
 
     if(iter == GPIOS.end())
         return NULL;
     else
-        return &(iter->second);
+        return iter->second;
 }

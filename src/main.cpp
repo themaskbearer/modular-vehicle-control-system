@@ -2,8 +2,7 @@
 
 #include <iostream>
 #include <unistd.h>
-
-#include "utils/ErrorHandler.h"
+#include "utils/ErrorLogger.h"
 #include "utils/DataLogger.h"
 #include "AUV.h"
 #include "utils/Configuration.h"
@@ -21,19 +20,13 @@ int main(int argc, char** argv)
             return 1;
     }
 
-    ERROR_HANDLER.initialize("errors.log");
-    ERROR_HANDLER.startThread();
-
-    DATA_LOGGER.initialize();
+    ERROR_LOGGER.startThread();
     DATA_LOGGER.startThread();
 
     AUV auv;
 
     auv.run();
     auv.shutdown();
-
-    DATA_LOGGER.close();
-    ERROR_HANDLER.close();
 
     return 0;
 }

@@ -23,8 +23,8 @@ public:
     void reverse();
 
 private:
-    GPIO* _direction;
-    GPIO* _enable;
+    GPIO::Ptr _direction;
+    GPIO::Ptr _enable;
 
 };
 

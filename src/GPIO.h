@@ -10,6 +10,7 @@
 
 #include <string>
 #include <fstream>
+#include <memory>
 
 #include "thread/Mutex.h"
 
@@ -17,11 +18,12 @@
 class GPIO
 {
 public:
-    GPIO();
-    GPIO(const GPIO& old);
-    virtual ~GPIO();
+    typedef std::shared_ptr<GPIO> Ptr;
 
-    void initialize(std::string gpioNumber);
+    explicit GPIO(unsigned int gpioNumber);
+    GPIO(const GPIO& old) =delete;
+    virtual ~GPIO();
+    GPIO& operator=(const GPIO& old) =delete;
 
     void makeInput();
     void makeOutput();
@@ -33,7 +35,6 @@ private:
     std::string _location;
     std::ofstream _direction;
     std::ofstream _value;
-    bool _initialized = false;
     bool _is144 = false;
 
     void initialize144();

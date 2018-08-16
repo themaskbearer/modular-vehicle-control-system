@@ -9,7 +9,7 @@
 #include "thread/LockGuard.h"
 
 
-template<> Configuration* Singleton<Configuration>::_instance = nullptr;
+template<> Configuration::Ptr Singleton<Configuration>::_instance = nullptr;
 
 Configuration::Configuration()
 {

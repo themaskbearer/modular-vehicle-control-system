@@ -22,6 +22,8 @@ const std::string ENABLE_CONSOLE = "enable_console";
 class Configuration : public Singleton<Configuration>
 {
 public:
+    typedef std::unique_ptr<Configuration> Ptr;
+
     Configuration();
     virtual ~Configuration();
 

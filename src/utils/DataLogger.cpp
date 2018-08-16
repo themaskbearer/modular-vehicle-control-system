@@ -5,53 +5,42 @@
  *      Author: jpollard
  */
 
+
 #include "DataLogger.h"
-#include "ErrorHandler.h"
+#include "ErrorLogger.h"
 #include "thread/LockGuard.h"
 
 #include <iostream>
 
 
-template<> DataLogger* Singleton<DataLogger>::_instance = nullptr;
+template<> DataLogger::Ptr Singleton<DataLogger>::_instance = nullptr;
 
 
 DataLogger::DataLogger()
 {
+    _dataFile.open(dataFileName_.c_str(), std::istream::app);
+    if(!_dataFile.is_open()) {
+        ERROR_LOGGER.recordError("Can't open data file log...");
+        throw FileOpenFailure(dataFileName_);
+    }
+    _dataFile << "\n\n\nNEW SESSION\n";
 
+    _accelFile.open(accelFileName_.c_str(), std::istream::app);
+    if(!_accelFile.is_open()) {
+        ERROR_LOGGER.recordError("Can't open accel file log...\n");
+        throw FileOpenFailure(accelFileName_);
+    }
+
+    _senseFile.open(senseFileName_.c_str(), std::istream::app);
+    if(!_senseFile.is_open()) {
+        ERROR_LOGGER.recordError("Can't open sense file log...\n");
+        throw FileOpenFailure(senseFileName_);
+    }
 }
 
 
 DataLogger::~DataLogger()
 {
-    if(_initialized)
-        close();
-}
-
-
-void DataLogger::initialize()
-{
-    _dataFile.open("data.log", std::istream::app);
-    if(!_dataFile.is_open())
-        ERROR_HANDLER.recordError(Exception("Can't open data file log...\n"));
-    else
-        _dataFile << "\n\n\nNEW SESSION\n";
-
-    _accelFile.open("accel.dat", std::istream::app);
-    if(!_accelFile.is_open())
-        ERROR_HANDLER.recordError(Exception("Can't open accel file log...\n"));
-
-    _senseFile.open("sense.dat", std::istream::app);
-    if(!_senseFile.is_open())
-        ERROR_HANDLER.recordError(Exception("Can't open sense file log...\n"));
-
-    _initialized = true;
-}
-
-
-void DataLogger::close()
-{
-    _initialized = false;
-
     _dataFile.close();
     _accelFile.close();
     _senseFile.close();

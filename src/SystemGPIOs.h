@@ -9,26 +9,28 @@ Author: jpollard
 #ifndef SYSTEMGPIOS_H_
 #define SYSTEMGPIOS_H_
 
+#include "utils/Singleton.h"
 #include "GPIO.h"
 #include <map>
 
 using std::map;
 using std::pair;
 
-class SystemGPIOs
+class SystemGPIOs : public Singleton<SystemGPIOs>
 {
+    friend class Singleton<SystemGPIOs>;
+
 public:
+    typedef std::unique_ptr<SystemGPIOs> Ptr;
+
     virtual ~SystemGPIOs();
 
-    static SystemGPIOs* instance() { if(_instance == nullptr) _instance = new SystemGPIOs(); return _instance; }
-    GPIO* getGPIO(int gpioNumber);
+    GPIO::Ptr getGPIO(int gpioNumber);
 
 private:
     SystemGPIOs();
 
-    static SystemGPIOs* _instance;
-
-    map<int, GPIO> GPIOS;
+    map<int, GPIO::Ptr> GPIOS;
 };
 
 #define SYSTEM_GPIOS        SystemGPIOs::instance()

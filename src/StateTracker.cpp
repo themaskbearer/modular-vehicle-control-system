@@ -5,9 +5,9 @@
  *      Author: jpollard
  */
 
+#include "utils/ErrorLogger.h"
 #include "StateTracker.h"
 #include "utils/MatrixOperations.h"
-#include "utils/ErrorHandler.h"
 #include "thread/LockGuard.h"
 
 #define _USE_MATH_DEFINES

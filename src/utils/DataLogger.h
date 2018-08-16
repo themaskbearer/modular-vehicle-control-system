@@ -11,8 +11,8 @@
 #include <fstream>
 #include <string>
 #include <queue>
+#include <stdexcept>
 
-#include "Exceptions.h"
 #include "thread/Thread.h"
 #include "thread/Mutex.h"
 #include "OperatorFunctions.h"
@@ -23,9 +23,10 @@ class DataLogger : public Thread, public Singleton<DataLogger>
     friend class Singleton<DataLogger>;
 
 public:
+    typedef std::unique_ptr<DataLogger> Ptr;
+
     virtual ~DataLogger();
 
-    void initialize();
     void close();
 
     void recordData(std::string data);
@@ -34,7 +35,10 @@ public:
 
 private:
     DataLogger();
-    bool _initialized = false;
+
+    const std::string dataFileName_ = "data.log";
+    const std::string accelFileName_ = "accel.dat";
+    const std::string senseFileName_ = "sense.dat";
 
     Mutex _access;
     std::ofstream _dataFile;
@@ -52,6 +56,5 @@ private:
 
 
 #define DATA_LOGGER     DataLogger::instance()
-
 
 #endif /* DATALOGGER_H_ */

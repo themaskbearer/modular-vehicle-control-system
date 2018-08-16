@@ -5,9 +5,10 @@
  *      Author: jpollard
  */
 
+#include "utils/ErrorLogger.h"
 #include "Mutex.h"
 #include "utils/Exceptions.h"
-#include "utils/ErrorHandler.h"
+#include "utils/OperatorFunctions.h"
 
 Mutex::Mutex()
 {
@@ -21,7 +22,7 @@ Mutex::~Mutex()
 {
     int error = pthread_mutex_destroy(&_mutex);
     if(error)
-        ERROR_HANDLER.recordError(Exception("Failed to destroy mutex", errno));
+        ERROR_LOGGER.recordError("Failed to destroy mutex, err: " + errno);
 }
 
 
