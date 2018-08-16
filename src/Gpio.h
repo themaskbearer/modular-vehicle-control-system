@@ -15,15 +15,15 @@
 #include "thread/Mutex.h"
 
 
-class GPIO
+class Gpio
 {
 public:
-    typedef std::shared_ptr<GPIO> Ptr;
+    typedef std::shared_ptr<Gpio> Ptr;
 
-    explicit GPIO(unsigned int gpioNumber);
-    GPIO(const GPIO& old) =delete;
-    virtual ~GPIO();
-    GPIO& operator=(const GPIO& old) =delete;
+    explicit Gpio(unsigned int gpioNumber);
+    Gpio(const Gpio& old) =delete;
+    virtual ~Gpio();
+    Gpio& operator=(const Gpio& old) =delete;
 
     void makeInput();
     void makeOutput();

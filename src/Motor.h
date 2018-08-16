@@ -8,7 +8,7 @@
 #ifndef MOTOR_H_
 #define MOTOR_H_
 
-#include "GPIO.h"
+#include "Gpio.h"
 
 class Motor
 {
@@ -23,8 +23,8 @@ public:
     void reverse();
 
 private:
-    GPIO::Ptr _direction;
-    GPIO::Ptr _enable;
+    Gpio::Ptr _direction;
+    Gpio::Ptr _enable;
 
 };
 

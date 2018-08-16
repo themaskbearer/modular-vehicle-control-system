@@ -1,17 +1,17 @@
 /*
- * GPIO.cpp
+ * Gpio.cpp
  *
  *  Created on: Mar 24, 2012
  *      Author: jpollard
  */
 
 #include "utils/ErrorLogger.h"
-#include "GPIO.h"
+#include "Gpio.h"
 #include "thread/LockGuard.h"
 
 #include <cstdlib>
 
-GPIO::GPIO(unsigned int gpioNumber)
+Gpio::Gpio(unsigned int gpioNumber)
 {
     if(gpioNumber == 144)
         initialize144();
@@ -33,7 +33,7 @@ GPIO::GPIO(unsigned int gpioNumber)
 }
 
 
-void GPIO::initialize144()
+void Gpio::initialize144()
 {
     _is144 = true;
 
@@ -48,14 +48,14 @@ void GPIO::initialize144()
 }
 
 
-GPIO::~GPIO()
+Gpio::~Gpio()
 {
     _value.close();
     _direction.close();
 }
 
 
-void GPIO::makeInput()
+void Gpio::makeInput()
 {
     // GPIO 144's direction is unable to be changed, so no-op
     if(_is144)
@@ -70,7 +70,7 @@ void GPIO::makeInput()
 }
 
 
-void GPIO::makeOutput()
+void Gpio::makeOutput()
 {
     // GPIO 144's direction is unable to be changed, so no-op
     if(_is144)
@@ -85,7 +85,7 @@ void GPIO::makeOutput()
 }
 
 
-void GPIO::setState(int state)
+void Gpio::setState(int state)
 {
     LockGuard guard(_access);
 
@@ -106,7 +106,7 @@ void GPIO::setState(int state)
 }
 
 
-int GPIO::readState()
+int Gpio::readState()
 {
     //not implemented yet
     return -1;
