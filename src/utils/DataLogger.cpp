@@ -18,23 +18,23 @@ template<> DataLogger::Ptr Singleton<DataLogger>::_instance = nullptr;
 
 DataLogger::DataLogger()
 {
-    _dataFile.open(dataFileName_.c_str(), std::istream::app);
+    _dataFile.open(_dataFileName.c_str(), std::istream::app);
     if(!_dataFile.is_open()) {
         ERROR_LOGGER.recordError("Can't open data file log...");
-        throw FileOpenFailure(dataFileName_);
+        throw FileOpenFailure(_dataFileName);
     }
     _dataFile << "\n\n\nNEW SESSION\n";
 
-    _accelFile.open(accelFileName_.c_str(), std::istream::app);
+    _accelFile.open(_accelFileName.c_str(), std::istream::app);
     if(!_accelFile.is_open()) {
         ERROR_LOGGER.recordError("Can't open accel file log...\n");
-        throw FileOpenFailure(accelFileName_);
+        throw FileOpenFailure(_accelFileName);
     }
 
-    _senseFile.open(senseFileName_.c_str(), std::istream::app);
+    _senseFile.open(_senseFileName.c_str(), std::istream::app);
     if(!_senseFile.is_open()) {
         ERROR_LOGGER.recordError("Can't open sense file log...\n");
-        throw FileOpenFailure(senseFileName_);
+        throw FileOpenFailure(_senseFileName);
     }
 }
 

@@ -32,7 +32,7 @@ public:
 private:
     ErrorLogger();
 
-    const std::string logFileName_ = "errors.log";
+    const std::string _logFileName = "errors.log";
 
     Mutex _access;
     std::ofstream _errorfile;

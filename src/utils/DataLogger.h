@@ -36,9 +36,9 @@ public:
 private:
     DataLogger();
 
-    const std::string dataFileName_ = "data.log";
-    const std::string accelFileName_ = "accel.dat";
-    const std::string senseFileName_ = "sense.dat";
+    const std::string _dataFileName = "data.log";
+    const std::string _accelFileName = "accel.dat";
+    const std::string _senseFileName = "sense.dat";
 
     Mutex _access;
     std::ofstream _dataFile;
