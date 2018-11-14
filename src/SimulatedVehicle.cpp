@@ -7,18 +7,6 @@
 
 #include "SimulatedVehicle.h"
 
-SimulatedVehicle::SimulatedVehicle()
-{
-    // TODO Auto-generated constructor stub
-
-}
-
-
-SimulatedVehicle::~SimulatedVehicle()
-{
-    // TODO Auto-generated destructor stub
-}
-
 
 State SimulatedVehicle::getPose()
 {

@@ -14,8 +14,8 @@
 class SimulatedVehicle : public Vehicle
 {
 public:
-    SimulatedVehicle();
-    virtual ~SimulatedVehicle();
+    SimulatedVehicle() = default;
+    virtual ~SimulatedVehicle() = default;
 
     State getPose();
     int getNumberOfMotors() { return 2; }
