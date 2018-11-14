@@ -27,8 +27,6 @@ public:
 
     virtual ~DataLogger();
 
-    void close();
-
     void recordData(std::string data);
     void recordAccel(std::string data);
     void recordSense(std::string data);
