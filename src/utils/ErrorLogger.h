@@ -14,7 +14,7 @@
 
 #include "utils/Singleton.h"
 #include "Exceptions.h"
-#include "thread/Thread.h"
+#include "utils/Thread.h"
 #include <mutex>
 
 

@@ -8,7 +8,7 @@
 #ifndef AIENGINE_H_
 #define AIENGINE_H_
 
-#include "thread/Thread.h"
+#include "utils/Thread.h"
 #include "MovementController.h"
 #include "Memory.h"
 #include "utils/MatrixOperations.h"

@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <mutex>
 
-#include "thread/Thread.h"
+#include "utils/Thread.h"
 #include "OperatorFunctions.h"
 #include "utils/Singleton.h"
 

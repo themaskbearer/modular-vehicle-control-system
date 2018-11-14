@@ -11,7 +11,7 @@
 #include <vector>
 #include <mutex>
 
-#include "thread/Thread.h"
+#include "utils/Thread.h"
 #include "i2cHandler.h"
 #include "Memory.h"
 #include "utils/DataLogger.h"
