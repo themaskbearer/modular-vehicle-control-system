@@ -58,7 +58,8 @@ void StateTracker::threadRoutine()
         updateState(readings);
 
         // TODO: Make this calculation dynamic
-        usleep(7100);   // Sample time is 10ms but due to processing time the sleep is reduced to get ~100 Hz
+        // Sample time is 10ms but due to processing time the sleep is reduced to get ~100 Hz
+        std::this_thread::sleep_for(std::chrono::microseconds(7100));
     }
 }
 

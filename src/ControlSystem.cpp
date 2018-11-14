@@ -41,7 +41,7 @@ void ControlSystem::threadRoutine()
         else
             runMovement(&_controller);
 
-        usleep(2000000);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }
 

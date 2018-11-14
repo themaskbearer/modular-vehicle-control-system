@@ -13,7 +13,7 @@ TestPlatform::TestPlatform()
 {
     // Since the GPIO are not in the correct state on power on, this allows for final configuration
     // of the vehicle before deployment where the motors aren't turning
-    usleep(300000000); // 5 mins
+    std::this_thread::sleep_for(std::chrono::minutes(5));
 
     _motors.push_back(Motor(MOTOR1DIR, MOTOR1EN));
     _motors.push_back(Motor(MOTOR2DIR, MOTOR2EN));
@@ -45,7 +45,7 @@ void TestPlatform::runCommand(const VehicleCommand& command)
         base = base << 1;
     }
 
-    usleep(command._timeElapsed_s * 1000000);
+    std::this_thread::sleep_for(std::chrono::duration<float>(command._timeElapsed_s));
 
     for(auto& motor : _motors)
         motor.off();
