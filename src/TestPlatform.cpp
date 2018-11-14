@@ -56,3 +56,9 @@ void TestPlatform::start()
 {
     _imu.start();
 }
+
+
+void TestPlatform::stop()
+{
+    _imu.stop();
+}

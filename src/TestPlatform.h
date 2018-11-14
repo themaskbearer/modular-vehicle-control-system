@@ -23,7 +23,8 @@ public:
 
     void runCommand(const VehicleCommand& command);
 
-    void start();
+    void start() override;
+    void stop() override;
 
 private:
     std::vector<Motor> _motors;

@@ -6,15 +6,21 @@
  */
 
 #include "AUV.h"
+#include "utils/Configuration.h"
 #include "SimulatedVehicle.h"
+#include "TestPlatform.h"
 #include "ControlSystem.h"
 
 
 
 AUV::AUV()
 {
-    // TODO: add switch depending on configuration which vehicle to use
-    _vehicle = std::make_shared<SimulatedVehicle>();
+    std::string vehicleType = CONFIG.getValue(VEHICLE_TYPE);
+    if(vehicleType == "test_platform")
+        _vehicle = std::make_shared<TestPlatform>();
+    else
+        _vehicle = std::make_shared<SimulatedVehicle>();
+
     _supervisor.reset(new ControlSystem(_vehicle));
 }
 
@@ -37,5 +43,6 @@ void AUV::run()
 
 void AUV::shutdown()
 {
-
+    _supervisor->stop();
+    _vehicle->stop();
 }
