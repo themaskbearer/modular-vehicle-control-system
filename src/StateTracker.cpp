@@ -8,7 +8,6 @@
 #include "utils/ErrorLogger.h"
 #include "StateTracker.h"
 #include "utils/MatrixOperations.h"
-#include "thread/LockGuard.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -53,11 +52,12 @@ void StateTracker::threadRoutine()
 {
     initializeOrientation();
 
-    while(true)
+    while(isRunning())
     {
         SensorData readings = _sensors.getSensorData();
         updateState(readings);
 
+        // TODO: Make this calculation dynamic
         usleep(7100);   // Sample time is 10ms but due to processing time the sleep is reduced to get ~100 Hz
     }
 }
@@ -196,7 +196,7 @@ void StateTracker::updateState(SensorData data)
 
 
     {
-        LockGuard guard(_access);
+        std::lock_guard<std::mutex> guard(_access);
         _lastState = _currentState;
     }
 }
@@ -204,6 +204,6 @@ void StateTracker::updateState(SensorData data)
 
 State StateTracker::getCurrentState()
 {
-    LockGuard guard(_access);
+    std::lock_guard<std::mutex> guard(_access);
     return _lastState;
 }

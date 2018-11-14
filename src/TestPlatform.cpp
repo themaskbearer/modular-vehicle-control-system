@@ -54,5 +54,5 @@ void TestPlatform::runCommand(const VehicleCommand& command)
 
 void TestPlatform::start()
 {
-    _imu.startThread();
+    _imu.start();
 }

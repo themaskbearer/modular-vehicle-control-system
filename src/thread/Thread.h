@@ -8,7 +8,8 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
-#include <pthread.h>
+#include <thread>
+#include <atomic>
 #include <unistd.h>
 
 class Thread
@@ -17,12 +18,16 @@ public:
     Thread();
     virtual ~Thread();
 
-    void startThread();
+    void start();
+    void stop();
+
+protected:
+    bool isRunning() { return _running; }
 
 private:
-    pthread_t _thread;
+    std::atomic_bool _running;
+    std::thread _thread;
 
-    static void *threadLauncher(void *arg);
     virtual void threadRoutine() =0;
 };
 

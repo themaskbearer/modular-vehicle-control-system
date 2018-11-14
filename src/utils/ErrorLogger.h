@@ -15,10 +15,10 @@
 #include "utils/Singleton.h"
 #include "Exceptions.h"
 #include "thread/Thread.h"
-#include "thread/Mutex.h"
+#include <mutex>
 
 
-class ErrorLogger : public Thread, public Singleton<ErrorLogger>
+class ErrorLogger : Thread, public Singleton<ErrorLogger>
 {
     friend class Singleton<ErrorLogger>;
 
@@ -34,11 +34,11 @@ private:
 
     const std::string _logFileName = "errors.log";
 
-    Mutex _access;
+    std::mutex _access;
     std::ofstream _errorfile;
     std::vector<std::string> _errorlist;
 
-    void threadRoutine();
+    void threadRoutine() override;
 
     void writeQueuetoFile();
     std::ostream& writeToStream(std::ostream& streamtowrite, const std::string& err);

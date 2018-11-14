@@ -22,19 +22,19 @@ ControlSystem::~ControlSystem()
 
 void ControlSystem::start()
 {
-    startThread();
+    Thread::start();
 }
 
 
 void ControlSystem::stop()
 {
-    // Stop the thread
+    Thread::stop();
 }
 
 
 void ControlSystem::threadRoutine()
 {
-    while(true)
+    while(isRunning())
     {
         if(!_learner.isLearningComplete())
             runMovement(&_learner);

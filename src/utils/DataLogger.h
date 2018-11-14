@@ -12,13 +12,13 @@
 #include <string>
 #include <queue>
 #include <stdexcept>
+#include <mutex>
 
 #include "thread/Thread.h"
-#include "thread/Mutex.h"
 #include "OperatorFunctions.h"
 #include "utils/Singleton.h"
 
-class DataLogger : public Thread, public Singleton<DataLogger>
+class DataLogger : Thread, public Singleton<DataLogger>
 {
     friend class Singleton<DataLogger>;
 
@@ -40,7 +40,7 @@ private:
     const std::string _accelFileName = "accel.dat";
     const std::string _senseFileName = "sense.dat";
 
-    Mutex _access;
+    std::mutex _access;
     std::ofstream _dataFile;
     std::ofstream _accelFile;
     std::ofstream _senseFile;

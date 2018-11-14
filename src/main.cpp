@@ -7,28 +7,13 @@
 #include "AUV.h"
 #include "utils/Configuration.h"
 
-void printCliUsage();
-bool processCommandArgs(int numOfArgs, char** args);
 
-int main(int argc, char** argv)
+void printCliUsage()
 {
-    if(argc > 1)
-    {
-        //TODO This is a terrible interface for this function
-        // Need better mechanism for determining restarts
-        if(processCommandArgs(argc, argv))
-            return 1;
-    }
-
-    ERROR_LOGGER.startThread();
-    DATA_LOGGER.startThread();
-
-    AUV auv;
-
-    auv.run();
-    auv.shutdown();
-
-    return 0;
+    std::cout << "Usage: command [OPTION]...\n" <<
+            "\t-t\tSpecify the type of vehicle to use\n" <<
+            "\t\tOptions are:\ttest\n\t\t\t\tsim\n\n" <<
+            "\t-h\tPrint this message\n" << std::endl;
 }
 
 
@@ -70,10 +55,33 @@ bool processCommandArgs(int numOfArgs, char** args)
 }
 
 
-void printCliUsage()
+void startLogs()
 {
-    std::cout << "Usage: command [OPTION]...\n" <<
-            "\t-t\tSpecify the type of vehicle to use\n" <<
-            "\t\tOptions are:\ttest\n\t\t\t\tsim\n\n" <<
-            "\t-h\tPrint this message\n" << std::endl;
+    std::string newSessionMarker = "\n\n\nNEW SESSION\n";
+    DATA_LOGGER.recordData(newSessionMarker);
+    ERROR_LOGGER.recordError(newSessionMarker);
 }
+
+
+int main(int argc, char** argv)
+{
+    if(argc > 1)
+    {
+        //TODO This is a terrible interface for this function
+        // Need better mechanism for determining restarts
+        if(processCommandArgs(argc, argv))
+            return 1;
+    }
+
+    startLogs();
+
+    AUV auv;
+
+    auv.run();
+    auv.shutdown();
+
+    return 0;
+}
+
+
+

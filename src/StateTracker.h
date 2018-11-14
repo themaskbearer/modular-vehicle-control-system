@@ -9,6 +9,7 @@
 #define STATETRACKER_H_
 
 #include <vector>
+#include <mutex>
 
 #include "thread/Thread.h"
 #include "i2cHandler.h"
@@ -50,7 +51,7 @@ private:
     int _accelCounter[3];
     float _biasFilter[3];
 
-    Mutex _access;
+    std::mutex _access;
 
     void threadRoutine();
     void initializeOrientation();

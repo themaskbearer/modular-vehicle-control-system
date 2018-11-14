@@ -9,7 +9,7 @@
 #define SRC_CONFIGURATION_H_
 
 #include "utils/Singleton.h"
-#include "thread/Mutex.h"
+#include <mutex>
 #include <unordered_map>
 #include <string>
 
@@ -32,7 +32,7 @@ public:
     void setValue(const std::string& key, const std::string& value);
 
 private:
-    Mutex _lock;
+    std::mutex _lock;
     std::unordered_map<std::string, std::string> _config;
 };
 

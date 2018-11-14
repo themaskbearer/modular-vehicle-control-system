@@ -7,28 +7,34 @@
 
 #include "Thread.h"
 
-#include "utils/Exceptions.h"
 
-Thread::Thread() : _thread(-1)
+Thread::Thread() :
+    _running(false)
 {
-
 }
 
 Thread::~Thread()
 {
-    pthread_cancel(_thread);
+    if(_running) {
+        _running = false;
+        _thread.join();
+    }
 }
 
-void *Thread::threadLauncher(void* arg)
+
+void Thread::start()
 {
-    reinterpret_cast<Thread*>(arg)->threadRoutine();
-    return NULL;
+    if(!_running) {
+        _running = true;
+        _thread = std::thread(&Thread::threadRoutine, this);
+    }
 }
 
-void Thread::startThread()
-{
-    int result = pthread_create(&_thread, NULL, &threadLauncher, this);
 
-    if(result)
-        throw Exception("Could not launch _thread", result);
+void Thread::stop()
+{
+    if(_running) {
+        _running = false;
+        _thread.join();
+    }
 }

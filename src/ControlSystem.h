@@ -20,8 +20,8 @@ public:
     ControlSystem(std::shared_ptr<Vehicle> vehicle);
     virtual ~ControlSystem();
 
-    void start();
-    void stop();
+    void start() override;
+    void stop() override;
 
 private:
     LearningBehavior _learner;

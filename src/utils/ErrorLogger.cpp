@@ -6,7 +6,6 @@
  */
 
 #include "ErrorLogger.h"
-#include "thread/LockGuard.h"
 
 #include <iostream>
 
@@ -22,19 +21,20 @@ ErrorLogger::ErrorLogger()
         throw FileOpenFailure(_logFileName);
     }
 
-    _errorfile << "\n\n\nNEW SESSION\n";
+    start();
 }
 
 
 ErrorLogger::~ErrorLogger()
 {
+    stop();
     _errorfile.close();
 }
 
 
 void ErrorLogger::threadRoutine()
 {
-    while(true)
+    while(isRunning())
     {
         writeQueuetoFile();
 
@@ -48,7 +48,7 @@ void ErrorLogger::writeQueuetoFile()
     std::vector<std::string> newErrors;
 
     {
-        LockGuard guard(_access);
+        std::lock_guard<std::mutex> guard(_access);
         newErrors = _errorlist;
         _errorlist.clear();
     }
@@ -68,6 +68,6 @@ std::ostream& ErrorLogger::writeToStream(std::ostream& streamtowrite, const std:
 
 void ErrorLogger::recordError(const std::string& err)
 {
-    LockGuard guard(_access);
+    std::lock_guard<std::mutex> guard(_access);
     _errorlist.push_back(err);
 }
