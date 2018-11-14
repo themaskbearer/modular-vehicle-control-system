@@ -23,6 +23,15 @@ string operator+(string str, int i)
     return str;
 }
 
+string operator+(string str, unsigned int i)
+{
+    const size_t maxLength = 12;
+    char converted[maxLength];
+    sprintf(converted, "%u", i);
+    str += converted;
+    return str;
+}
+
 string operator+(string str, float f)
 {
     ostringstream strm;

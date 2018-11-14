@@ -8,14 +8,16 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
+#include "HardwareIO.h"
+#include "HardwareIOFile.h"
+
 #include <string>
 #include <fstream>
 #include <memory>
+#include <mutex>
 
-#include "thread/Mutex.h"
 
-
-class Gpio
+class Gpio : public HardwareIO
 {
 public:
     typedef std::shared_ptr<Gpio> Ptr;
@@ -25,19 +27,17 @@ public:
     virtual ~Gpio();
     Gpio& operator=(const Gpio& old) =delete;
 
-    void makeInput();
-    void makeOutput();
-    void setState(int state);
-    int readState(); //not implemented yet
+    void makeInput() override;
+    void makeOutput() override;
+    void setState(int state) override;
+    int readState() override; //not implemented yet
 
 private:
-    Mutex _access;
-    std::string _location;
-    std::ofstream _direction;
-    std::ofstream _value;
-    bool _is144 = false;
+    const std::string _path = "/sys/class/gpio/gpio";
 
-    void initialize144();
+    std::mutex _access;
+    HardwareIOFile _direction;
+    HardwareIOFile _value;
 };
 
 #endif /* GPIO_H_ */

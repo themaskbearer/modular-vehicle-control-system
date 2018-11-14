@@ -10,7 +10,7 @@ Author: jpollard
 #define SYSTEMGPIOS_H_
 
 #include "utils/Singleton.h"
-#include "Gpio.h"
+#include "HardwareIO.h"
 #include <map>
 
 using std::map;
@@ -25,12 +25,12 @@ public:
 
     virtual ~SystemGPIOs();
 
-    Gpio::Ptr getGPIO(int gpioNumber);
+    HardwareIO::Ptr getGPIO(int gpioNumber);
 
 private:
     SystemGPIOs();
 
-    map<int, Gpio::Ptr> GPIOS;
+    map<int, HardwareIO::Ptr> GPIOS;
 };
 
 #define SYSTEM_GPIOS        SystemGPIOs::instance()

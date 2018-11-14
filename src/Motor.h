@@ -23,8 +23,8 @@ public:
     void reverse();
 
 private:
-    Gpio::Ptr _direction;
-    Gpio::Ptr _enable;
+    HardwareIO::Ptr _direction;
+    HardwareIO::Ptr _enable;
 
 };
 

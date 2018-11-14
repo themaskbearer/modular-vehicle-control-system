@@ -37,4 +37,11 @@ public:
     FileOpenFailure(std::string fileName) : std::runtime_error("Failed to open data file " + fileName) {}
 };
 
+
+class OperationNotSupported : public std::runtime_error
+{
+public:
+    OperationNotSupported(std::string operation) : std::runtime_error("Following operation is not supported: " + operation) {}
+};
+
 #endif /* EXCEPTION_H_ */
