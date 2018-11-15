@@ -23,7 +23,30 @@
 
 I2cHandler::I2cHandler()
 {
-    initialize();
+    _device = open(_deviceFilePath.c_str(), O_RDWR);
+    if(_device < 0) {
+        ERROR_LOGGER.recordError("Failed to open " + _deviceFilePath + " with errno " + errno);
+        throw FileOpenFailure(_deviceFilePath);
+    }
+
+    unsigned char accelreg[4];
+    accelreg[0] = ACCEL_POWER_CTL;
+    accelreg[1] = ACCEL_PWR_CTL_VAL;
+    accelreg[2] = ACCEL_DATA_FORMAT;
+    accelreg[3] = ACCEL_DATA_FORMAT_VAL;
+    writeAccel(accelreg, 2);
+    writeAccel(&accelreg[2], 2);
+
+    unsigned char gyroreg[6];
+    gyroreg[0] = GYRO_DLPF_FS;
+    gyroreg[1] = GYRO_DLPF_FS_VAL;
+    gyroreg[2] = GYRO_SMPLRT_DV;
+    gyroreg[3] = GYRO_SMPLRT_DV_VAL;
+    gyroreg[4] = GYRO_PWR_MGM;
+    gyroreg[5] = GYRO_PWR_MGM_VAL;
+    writeGyro(gyroreg, 2);
+    writeGyro(&gyroreg[2], 2);
+    writeGyro(&gyroreg[4], 2);
 }
 
 I2cHandler::~I2cHandler()
@@ -31,77 +54,46 @@ I2cHandler::~I2cHandler()
     close(_device);
 }
 
-void I2cHandler::initialize()
-{
-    _device = open("/dev/i2c-3", O_RDWR);
-
-    try
-    {
-        unsigned char accelreg[4];
-        accelreg[0] = ACCEL_POWER_CTL;
-        accelreg[1] = ACCEL_PWR_CTL_VAL;
-        accelreg[2] = ACCEL_DATA_FORMAT;
-        accelreg[3] = ACCEL_DATA_FORMAT_VAL;
-        writeAccel(accelreg, 2);
-        writeAccel(&accelreg[2], 2);
-
-        unsigned char gyroreg[6];
-        gyroreg[0] = GYRO_DLPF_FS;
-        gyroreg[1] = GYRO_DLPF_FS_VAL;
-        gyroreg[2] = GYRO_SMPLRT_DV;
-        gyroreg[3] = GYRO_SMPLRT_DV_VAL;
-        gyroreg[4] = GYRO_PWR_MGM;
-        gyroreg[5] = GYRO_PWR_MGM_VAL;
-        writeGyro(gyroreg, 2);
-        writeGyro(&gyroreg[2], 2);
-        writeGyro(&gyroreg[4], 2);
-    }
-    catch(const Exception& e)
-    {
-        ERROR_LOGGER.recordError("Failed to initialize device: " + e.getMessage() + ", " + e.getErrorValue());
-        throw e;
-    }
-}
-
 void I2cHandler::writeI2C(unsigned char* buffer, int bytestowrite)
 {
     int byteswriten = write(_device, buffer, bytestowrite);
-
-    if(byteswriten != bytestowrite)
-        throw Exception("Failed to write to I2C bus", errno);
-
-    return;
+    if(byteswriten != bytestowrite) {
+        ERROR_LOGGER.recordError("Failed I2C write with errno " + errno);
+        throw I2CFailure("I2C write", errno);
+    }
 }
 
 void I2cHandler::writeAccel(unsigned char* buffer, int bytestowrite)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, ACCEL_ADDR);
+    if(error < 0) {
+        ERROR_LOGGER.recordError("Failed I2C write to the accelerometer with errno " + errno);
+        throw I2CFailure("Set ioctl for writing Accelerometer", errno);
+    }
 
-    if(error < 0)
-        throw Exception("Failed set ioctl for writing Accelerometer", errno);
-    else
-        writeI2C(buffer, bytestowrite);
-
+    writeI2C(buffer, bytestowrite);
 }
 
-void I2cHandler::writeComp(unsigned char* buffer, int bytestowrite)
+void I2cHandler::writeCompass(unsigned char* buffer, int bytestowrite)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, COMP_ADDR);
+    if(error < 0) {
+        ERROR_LOGGER.recordError("Failed I2C write to the compass with errno " + errno);
+        throw I2CFailure("Set ioctl for writing Compass", errno);
+    }
 
-    if(error < 0)
-        throw Exception("Failed set ioctl for writing Compass", errno);
-    else
-        writeI2C(buffer, bytestowrite);
+    writeI2C(buffer, bytestowrite);
 }
 
 void I2cHandler::writeGyro(unsigned char* buffer, int bytestowrite)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, GYRO_ADDR);
+    if(error < 0) {
+        ERROR_LOGGER.recordError("Failed I2C write to the gyro with errno " + errno);
+        throw I2CFailure("Set ioctl for writing Gyro", errno);
+    }
 
-    if(error < 0)
-        throw Exception("Failed to set ioctl for writing Gyro", errno);
-    else
-        writeI2C(buffer, bytestowrite);
+    writeI2C(buffer, bytestowrite);
 }
 
 void I2cHandler::readI2C(unsigned char* buffer, int bytestoread)
@@ -109,42 +101,43 @@ void I2cHandler::readI2C(unsigned char* buffer, int bytestoread)
     writeI2C(buffer, 1);
 
     int bytesread = read(_device, &buffer[1], bytestoread);
-
-    if(bytesread != bytestoread)
-        throw Exception("Failed to read bytes from I2C", errno);
-
-    return;
+    if(bytesread != bytestoread) {
+        ERROR_LOGGER.recordError("Failed I2C read with errno " + errno);
+        throw I2CFailure("I2C read", errno);
+    }
 }
 
 void I2cHandler::readAccel(unsigned char* buffer, int bytestoread)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, ACCEL_ADDR);
+    if(error < 0) {
+        ERROR_LOGGER.recordError("Failed I2C read the accelerometer with errno " + errno);
+        throw I2CFailure("Set ioctl for reading Accelerometer", errno);
+    }
 
-    if(error < 0)
-        throw Exception("Failed to set ioctl for reading Accelerometer", errno);
-    else
-        readI2C(buffer, bytestoread);
-
+    readI2C(buffer, bytestoread);
 }
 
-void I2cHandler::readComp(unsigned char* buffer, int bytestoread)
+void I2cHandler::readCompass(unsigned char* buffer, int bytestoread)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, COMP_ADDR);
+    if(error < 0) {
+        ERROR_LOGGER.recordError("Failed I2C read the compass with errno " + errno);
+        throw I2CFailure("Set ioctl for reading Compass", errno);
+    }
 
-    if(error < 0)
-        throw Exception("Failed to set ioctl for reading Compass", errno);
-    else
-        readI2C(buffer, bytestoread);
+    readI2C(buffer, bytestoread);
 }
 
 void I2cHandler::readGyro(unsigned char* buffer, int bytestoread)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, GYRO_ADDR);
+    if(error < 0) {
+        ERROR_LOGGER.recordError("Failed I2C read the gyro with errno " + errno);
+        throw I2CFailure("Set ioctl for reading Gyro", errno);
+    }
 
-    if(error < 0)
-        throw Exception("Failed to set ioctl for reading Gyro", errno);
-    else
-        readI2C(buffer, bytestoread);
+    readI2C(buffer, bytestoread);
 }
 
 SensorData I2cHandler::getSensorData()

@@ -12,6 +12,8 @@
 #include <string>
 #include "errno.h"
 
+#include "OperatorFunctions.h"
+
 
 class Exception : public std::exception
 {
@@ -42,6 +44,13 @@ class OperationNotSupported : public std::runtime_error
 {
 public:
     OperationNotSupported(std::string operation) : std::runtime_error("Following operation is not supported: " + operation) {}
+};
+
+class I2CFailure : public std::runtime_error
+{
+public:
+    I2CFailure(std::string operation, unsigned int errCode) :
+        std::runtime_error("Failed to perform the following i2c operation: "  + operation + " with error " + errCode) {}
 };
 
 #endif /* EXCEPTION_H_ */
