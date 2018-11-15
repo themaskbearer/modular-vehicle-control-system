@@ -24,6 +24,8 @@ public:
     void processCommandResults(const State& finalState);
 
 private:
+    MemoryStorage* _memories;
+
     State _currentMoveInitialState;
     State _currentMovePrediction;
     matrix::Matrix _currentR;

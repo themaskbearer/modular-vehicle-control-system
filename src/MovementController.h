@@ -10,22 +10,15 @@
 
 #include "VehicleCommand.h"
 #include "State.h"
-#include "Memory.h"
-#include <vector>
 
-typedef std::vector<Memory> MemoryStorage;
 
 class MovementController
 {
 public:
-    MovementController(MemoryStorage* memories) : _memories(memories) {}
-    virtual ~MovementController() {}
+    virtual ~MovementController() = default;
 
     virtual VehicleCommand getCommandToExecute(const State& currentTarget, const State& currentState) =0;
     virtual void processCommandResults(const State& finalState) =0;
-
-protected:
-    MemoryStorage* _memories;
 };
 
 #endif /* SRC_MOVEMENTCONTROLLER_H_ */

@@ -12,9 +12,8 @@
 #include <cmath>
 
 AIEngine::AIEngine(MemoryStorage* memories) :
-    MovementController(memories)
+    _memories(memories)
 {
-
 }
 
 

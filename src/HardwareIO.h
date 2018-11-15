@@ -15,7 +15,7 @@ class HardwareIO
 public:
     typedef std::shared_ptr<HardwareIO> Ptr;
 
-    virtual ~HardwareIO() {};
+    virtual ~HardwareIO() = default;
 
     virtual void makeInput() =0;
     virtual void makeOutput() =0;

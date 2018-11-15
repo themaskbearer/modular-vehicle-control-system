@@ -39,6 +39,7 @@ private:
     unsigned int _learningIndex = 0;
 
     Memory currentMemory;
+    MemoryStorage* _memories;
 
     void addMotorDirectionCombinations(unsigned int motorsUsedMask);
     void addDurationVariations(unsigned int motorsUsedMask, unsigned int motorDirectionMask);

@@ -10,8 +10,8 @@
 #include <cmath>
 
 LearningBehavior::LearningBehavior(unsigned int numOfMotors, MemoryStorage* memories) :
-    MovementController(memories),
-    _numOfMotors(numOfMotors)
+    _numOfMotors(numOfMotors),
+    _memories(memories)
 {
     int numberOfCombinations =std::pow(2, _numOfMotors) - 1;
     for(int motorsUsedMask = 1; motorsUsedMask <= numberOfCombinations; ++motorsUsedMask)

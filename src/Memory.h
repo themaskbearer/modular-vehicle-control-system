@@ -13,6 +13,8 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
+
 using std::istream;
 using std::ostream;
 
@@ -34,5 +36,7 @@ public:
 
 istream &operator>>(istream &strm, Memory mem);
 ostream &operator<<(ostream &strm, Memory mem);
+
+typedef std::vector<Memory> MemoryStorage;
 
 #endif /* MEMORY_H_ */
