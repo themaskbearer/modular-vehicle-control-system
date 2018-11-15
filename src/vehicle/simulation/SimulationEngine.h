@@ -8,8 +8,8 @@
 #ifndef SIMULATIONENGINE_H_
 #define SIMULATIONENGINE_H_
 
-#include "State.h"
-#include "VehicleCommand.h"
+#include "vehicle/State.h"
+#include "vehicle/VehicleCommand.h"
 
 class SimulationEngine
 {

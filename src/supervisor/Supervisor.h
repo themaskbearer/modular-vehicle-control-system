@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include "Vehicle.h"
+#include "vehicle/Vehicle.h"
 
 class Supervisor {
 public:

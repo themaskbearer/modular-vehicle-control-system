@@ -8,8 +8,8 @@
 #ifndef SRC_MOVEMENTCONTROLLER_H_
 #define SRC_MOVEMENTCONTROLLER_H_
 
-#include "VehicleCommand.h"
-#include "State.h"
+#include "vehicle/VehicleCommand.h"
+#include "vehicle/State.h"
 
 
 class MovementController

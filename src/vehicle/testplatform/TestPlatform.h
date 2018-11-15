@@ -8,7 +8,7 @@
 #ifndef SRC_TESTPLATFORM_H_
 #define SRC_TESTPLATFORM_H_
 
-#include "Vehicle.h"
+#include "vehicle/Vehicle.h"
 #include "StateTracker.h"
 #include "Motor.h"
 

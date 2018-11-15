@@ -8,7 +8,7 @@
 #ifndef SRC_SIMULATEDVEHICLE_H_
 #define SRC_SIMULATEDVEHICLE_H_
 
-#include "Vehicle.h"
+#include "vehicle/Vehicle.h"
 #include "SimulationEngine.h"
 
 class SimulatedVehicle : public Vehicle

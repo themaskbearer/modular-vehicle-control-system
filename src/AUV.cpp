@@ -7,9 +7,9 @@
 
 #include "AUV.h"
 #include "utils/Configuration.h"
-#include "SimulatedVehicle.h"
-#include "TestPlatform.h"
-#include "ControlSystem.h"
+#include "vehicle/simulation/SimulatedVehicle.h"
+#include "vehicle/testplatform/TestPlatform.h"
+#include "supervisor/ControlSystem.h"
 
 
 

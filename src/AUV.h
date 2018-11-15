@@ -10,8 +10,8 @@
 
 #include <memory>
 
-#include "Vehicle.h"
-#include "Supervisor.h"
+#include "vehicle/Vehicle.h"
+#include "supervisor/Supervisor.h"
 
 class AUV {
 public:

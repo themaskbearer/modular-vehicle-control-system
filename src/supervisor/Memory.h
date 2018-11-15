@@ -8,8 +8,8 @@
 #ifndef MEMORY_H_
 #define MEMORY_H_
 
-#include "State.h"
-#include "VehicleCommand.h"
+#include "vehicle/State.h"
+#include "vehicle/VehicleCommand.h"
 
 #include <string>
 #include <fstream>

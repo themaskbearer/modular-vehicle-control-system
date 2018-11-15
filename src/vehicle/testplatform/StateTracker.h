@@ -13,7 +13,7 @@
 
 #include "utils/Thread.h"
 #include "i2cHandler.h"
-#include "Memory.h"
+#include "vehicle/State.h"
 #include "utils/DataLogger.h"
 
 #define ACCEL_SCALE_FCTR        4
