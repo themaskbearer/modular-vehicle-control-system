@@ -13,17 +13,20 @@
 #include "AIEngine.h"
 #include "LearningBehavior.h"
 #include "PathPlanner.h"
+#include "vehicle/Vehicle.h"
 
 class ControlSystem : public Supervisor, Thread
 {
 public:
-    ControlSystem(std::shared_ptr<Vehicle> vehicle);
+    ControlSystem(Vehicle::Ptr vehicle);
     virtual ~ControlSystem();
 
     void start() override;
     void stop() override;
 
 private:
+    Vehicle::Ptr _vehicle;
+
     LearningBehavior _learner;
     PathPlanner _planner;
     AIEngine _controller;

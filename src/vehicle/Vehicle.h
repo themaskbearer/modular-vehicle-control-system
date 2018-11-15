@@ -8,14 +8,17 @@
 #ifndef VEHICLE_H_
 #define VEHICLE_H_
 
+#include <memory>
+
 #include "State.h"
 #include "VehicleCommand.h"
 
 class Vehicle
 {
 public:
-    Vehicle() {}
-    virtual ~Vehicle() {};
+    typedef std::shared_ptr<Vehicle> Ptr;
+
+    virtual ~Vehicle() = default;
 
     virtual State getPose() =0;
     virtual int getNumberOfMotors() =0;

@@ -22,8 +22,8 @@ public:
     void shutdown();
 
 private:
-    std::shared_ptr<Vehicle> _vehicle;
-    std::unique_ptr<Supervisor> _supervisor;
+    Vehicle::Ptr _vehicle;
+    Supervisor::Ptr _supervisor;
 
 };
 

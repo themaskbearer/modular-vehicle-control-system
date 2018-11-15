@@ -7,8 +7,8 @@
 
 #include "ControlSystem.h"
 
-ControlSystem::ControlSystem(std::shared_ptr<Vehicle> vehicle) :
-    Supervisor(vehicle),
+ControlSystem::ControlSystem(Vehicle::Ptr vehicle) :
+    _vehicle(vehicle),
     _learner(vehicle->getNumberOfMotors(), &_memories),
     _controller(&_memories)
 {

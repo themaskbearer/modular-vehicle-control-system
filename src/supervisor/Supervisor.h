@@ -10,18 +10,14 @@
 
 #include <memory>
 
-#include "vehicle/Vehicle.h"
-
 class Supervisor {
 public:
-    Supervisor(std::shared_ptr<Vehicle> vehicle) : _vehicle(vehicle) {}
-    virtual ~Supervisor() {}
+    typedef std::unique_ptr<Supervisor> Ptr;
+
+    virtual ~Supervisor() = default;
 
     virtual void start() =0;
     virtual void stop() =0;
-
-protected:
-    std::shared_ptr<Vehicle> _vehicle;
 };
 
 #endif /* SRC_SUPERVISOR_H_ */
