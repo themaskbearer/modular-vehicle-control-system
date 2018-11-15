@@ -16,7 +16,7 @@ HardwareIOFile::HardwareIOFile(std::string fileName) :
 {
     _file.open(_fileName.c_str());
     if(!_file.is_open()) {
-        ERROR_LOGGER.recordError("failed to open hardware IO file " + _fileName);
+        ERROR_LOGGER.logError("failed to open hardware IO file " + _fileName);
         throw FileOpenFailure(_fileName);
     }
 }

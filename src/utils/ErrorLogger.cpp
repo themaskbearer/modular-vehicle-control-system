@@ -66,7 +66,7 @@ std::ostream& ErrorLogger::writeToStream(std::ostream& streamtowrite, const std:
 }
 
 
-void ErrorLogger::recordError(const std::string& err)
+void ErrorLogger::logError(const std::string& err)
 {
     std::lock_guard<std::mutex> guard(_access);
     _errorlist.push_back(err);

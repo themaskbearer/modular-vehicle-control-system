@@ -25,7 +25,7 @@ I2cHandler::I2cHandler()
 {
     _device = open(_deviceFilePath.c_str(), O_RDWR);
     if(_device < 0) {
-        ERROR_LOGGER.recordError("Failed to open " + _deviceFilePath + " with errno " + errno);
+        ERROR_LOGGER.logError("Failed to open " + _deviceFilePath + " with errno " + errno);
         throw FileOpenFailure(_deviceFilePath);
     }
 
@@ -58,7 +58,7 @@ void I2cHandler::writeI2C(unsigned char* buffer, int bytestowrite)
 {
     int byteswriten = write(_device, buffer, bytestowrite);
     if(byteswriten != bytestowrite) {
-        ERROR_LOGGER.recordError("Failed I2C write with errno " + errno);
+        ERROR_LOGGER.logError("Failed I2C write with errno " + errno);
         throw I2CFailure("I2C write", errno);
     }
 }
@@ -67,7 +67,7 @@ void I2cHandler::writeAccel(unsigned char* buffer, int bytestowrite)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, ACCEL_ADDR);
     if(error < 0) {
-        ERROR_LOGGER.recordError("Failed I2C write to the accelerometer with errno " + errno);
+        ERROR_LOGGER.logError("Failed I2C write to the accelerometer with errno " + errno);
         throw I2CFailure("Set ioctl for writing Accelerometer", errno);
     }
 
@@ -78,7 +78,7 @@ void I2cHandler::writeCompass(unsigned char* buffer, int bytestowrite)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, COMP_ADDR);
     if(error < 0) {
-        ERROR_LOGGER.recordError("Failed I2C write to the compass with errno " + errno);
+        ERROR_LOGGER.logError("Failed I2C write to the compass with errno " + errno);
         throw I2CFailure("Set ioctl for writing Compass", errno);
     }
 
@@ -89,7 +89,7 @@ void I2cHandler::writeGyro(unsigned char* buffer, int bytestowrite)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, GYRO_ADDR);
     if(error < 0) {
-        ERROR_LOGGER.recordError("Failed I2C write to the gyro with errno " + errno);
+        ERROR_LOGGER.logError("Failed I2C write to the gyro with errno " + errno);
         throw I2CFailure("Set ioctl for writing Gyro", errno);
     }
 
@@ -102,7 +102,7 @@ void I2cHandler::readI2C(unsigned char* buffer, int bytestoread)
 
     int bytesread = read(_device, &buffer[1], bytestoread);
     if(bytesread != bytestoread) {
-        ERROR_LOGGER.recordError("Failed I2C read with errno " + errno);
+        ERROR_LOGGER.logError("Failed I2C read with errno " + errno);
         throw I2CFailure("I2C read", errno);
     }
 }
@@ -111,7 +111,7 @@ void I2cHandler::readAccel(unsigned char* buffer, int bytestoread)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, ACCEL_ADDR);
     if(error < 0) {
-        ERROR_LOGGER.recordError("Failed I2C read the accelerometer with errno " + errno);
+        ERROR_LOGGER.logError("Failed I2C read the accelerometer with errno " + errno);
         throw I2CFailure("Set ioctl for reading Accelerometer", errno);
     }
 
@@ -122,7 +122,7 @@ void I2cHandler::readCompass(unsigned char* buffer, int bytestoread)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, COMP_ADDR);
     if(error < 0) {
-        ERROR_LOGGER.recordError("Failed I2C read the compass with errno " + errno);
+        ERROR_LOGGER.logError("Failed I2C read the compass with errno " + errno);
         throw I2CFailure("Set ioctl for reading Compass", errno);
     }
 
@@ -133,7 +133,7 @@ void I2cHandler::readGyro(unsigned char* buffer, int bytestoread)
 {
     int error = ioctl(_device, I2C_SLAVE_FORCE, GYRO_ADDR);
     if(error < 0) {
-        ERROR_LOGGER.recordError("Failed I2C read the gyro with errno " + errno);
+        ERROR_LOGGER.logError("Failed I2C read the gyro with errno " + errno);
         throw I2CFailure("Set ioctl for reading Gyro", errno);
     }
 
@@ -154,7 +154,7 @@ SensorData I2cHandler::getSensorData()
     }
     catch(Exception& e)
     {
-        ERROR_LOGGER.recordError(e.what());
+        ERROR_LOGGER.logError(e.what());
 
         for(int i = 0; i < 7; i++)
             data[i] = 0;
@@ -170,7 +170,7 @@ SensorData I2cHandler::getSensorData()
     }
     catch(Exception& e)
     {
-        ERROR_LOGGER.recordError(e.what());
+        ERROR_LOGGER.logError(e.what());
 
         for(int i = 0; i < 7; i++)
             data[i] = 0;

@@ -45,6 +45,6 @@ void Gpio::setState(int state)
 
 int Gpio::readState()
 {
-    ERROR_LOGGER.recordError("Tried to use Gpio::readState");
+    ERROR_LOGGER.logError("Tried to use Gpio::readState");
     throw OperationNotSupported("Gpio::readState");
 }

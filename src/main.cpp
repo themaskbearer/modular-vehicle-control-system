@@ -59,7 +59,7 @@ void startLogs()
 {
     std::string newSessionMarker = "\n\n\nNEW SESSION\n";
     DATA_LOGGER.recordData(newSessionMarker);
-    ERROR_LOGGER.recordError(newSessionMarker);
+    ERROR_LOGGER.logError(newSessionMarker);
 }
 
 

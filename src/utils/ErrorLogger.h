@@ -27,7 +27,7 @@ public:
 
     virtual ~ErrorLogger();
 
-    void recordError(const std::string& err);
+    void logError(const std::string& err);
 
 private:
     ErrorLogger();
