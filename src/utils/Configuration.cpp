@@ -6,10 +6,9 @@
  */
 
 #include "Configuration.h"
-#include "thread/LockGuard.h"
 
 
-template<> Configuration* Singleton<Configuration>::_instance = nullptr;
+template<> Configuration::Ptr Singleton<Configuration>::_instance = nullptr;
 
 Configuration::Configuration()
 {
@@ -34,7 +33,7 @@ bool Configuration::isValueSet(const std::string& key)
 
 std::string Configuration::getValue(const std::string& key)
 {
-    LockGuard guard(_lock);
+    std::lock_guard<std::mutex> guard(_lock);
     std::string value;
 
     auto data_pair = _config.find(key);
@@ -47,7 +46,7 @@ std::string Configuration::getValue(const std::string& key)
 
 void Configuration::setValue(const std::string& key, const std::string& value)
 {
-    LockGuard guard(_lock);
+    std::lock_guard<std::mutex> guard(_lock);
     auto insertResult = _config.insert(std::pair<std::string, std::string>(key, value));
     if(!insertResult.second)
     {

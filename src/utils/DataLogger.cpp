@@ -5,52 +5,43 @@
  *      Author: jpollard
  */
 
+
 #include "DataLogger.h"
-#include "ErrorHandler.h"
-#include "thread/LockGuard.h"
+#include "ErrorLogger.h"
 
 #include <iostream>
 
 
-DataLogger* DataLogger::_instance = nullptr;
+template<> DataLogger::Ptr Singleton<DataLogger>::_instance = nullptr;
 
 
 DataLogger::DataLogger()
 {
+    _dataFile.open(_dataFileName.c_str(), std::istream::app);
+    if(!_dataFile.is_open()) {
+        ERROR_LOGGER.logError("Can't open data file log...");
+        throw FileOpenFailure(_dataFileName);
+    }
 
+    _accelFile.open(_accelFileName.c_str(), std::istream::app);
+    if(!_accelFile.is_open()) {
+        ERROR_LOGGER.logError("Can't open accel file log...\n");
+        throw FileOpenFailure(_accelFileName);
+    }
+
+    _senseFile.open(_senseFileName.c_str(), std::istream::app);
+    if(!_senseFile.is_open()) {
+        ERROR_LOGGER.logError("Can't open sense file log...\n");
+        throw FileOpenFailure(_senseFileName);
+    }
+
+    start();
 }
 
 
 DataLogger::~DataLogger()
 {
-    if(_initialized)
-        close();
-}
-
-
-void DataLogger::initialize()
-{
-    _dataFile.open("data.log", std::istream::app);
-    if(!_dataFile.is_open())
-        ERROR_HANDLER->recordError(Exception("Can't open data file log...\n"));
-    else
-        _dataFile << "\n\n\nNEW SESSION\n";
-
-    _accelFile.open("accel.dat", std::istream::app);
-    if(!_accelFile.is_open())
-        ERROR_HANDLER->recordError(Exception("Can't open accel file log...\n"));
-
-    _senseFile.open("sense.dat", std::istream::app);
-    if(!_senseFile.is_open())
-        ERROR_HANDLER->recordError(Exception("Can't open sense file log...\n"));
-
-    _initialized = true;
-}
-
-
-void DataLogger::close()
-{
-    _initialized = false;
+    stop();
 
     _dataFile.close();
     _accelFile.close();
@@ -60,13 +51,13 @@ void DataLogger::close()
 
 void DataLogger::threadRoutine()
 {
-    while(true)
+    while(isRunning())
     {
         writeQueuetoFile(_dataList);
         writeQueuetoFile(_accelList);
         writeQueuetoFile(_senseList);
 
-        usleep(1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
@@ -76,7 +67,7 @@ void DataLogger::writeQueuetoFile(std::vector<std::string>& queue)
     std::vector<std::string> newData;
 
     {
-        LockGuard guard(_access);
+        std::lock_guard<std::mutex> guard(_access);
         newData = queue;
         queue.clear();
     }
@@ -95,20 +86,20 @@ std::ostream& DataLogger::writeStringtoStream(std::ostream& streamtowrite, std::
 
 void DataLogger::recordData(std::string data)
 {
-    LockGuard guard(_access);
+    std::lock_guard<std::mutex> guard(_access);
     _dataList.push_back(data);
 }
 
 
 void DataLogger::recordAccel(string data)
 {
-    LockGuard guard(_access);
+    std::lock_guard<std::mutex> guard(_access);
     _accelList.push_back(data);
 }
 
 
 void DataLogger::recordSense(string data)
 {
-    LockGuard guard(_access);
+    std::lock_guard<std::mutex> guard(_access);
     _senseList.push_back(data);
 }

@@ -9,7 +9,7 @@
 #define SRC_CONFIGURATION_H_
 
 #include "utils/Singleton.h"
-#include "thread/Mutex.h"
+#include <mutex>
 #include <unordered_map>
 #include <string>
 
@@ -22,6 +22,8 @@ const std::string ENABLE_CONSOLE = "enable_console";
 class Configuration : public Singleton<Configuration>
 {
 public:
+    typedef std::unique_ptr<Configuration> Ptr;
+
     Configuration();
     virtual ~Configuration();
 
@@ -30,7 +32,7 @@ public:
     void setValue(const std::string& key, const std::string& value);
 
 private:
-    Mutex _lock;
+    std::mutex _lock;
     std::unordered_map<std::string, std::string> _config;
 };
 

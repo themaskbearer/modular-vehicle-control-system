@@ -10,21 +10,20 @@
 
 #include <memory>
 
-#include "Vehicle.h"
-#include "Supervisor.h"
+#include "vehicle/Vehicle.h"
+#include "supervisor/Supervisor.h"
 
 class AUV {
 public:
     AUV();
     ~AUV();
 
-    void initialize();
     void run();
     void shutdown();
 
 private:
-    std::shared_ptr<Vehicle> _vehicle;
-    std::unique_ptr<Supervisor> _supervisor;
+    Vehicle::Ptr _vehicle;
+    Supervisor::Ptr _supervisor;
 
 };
 
