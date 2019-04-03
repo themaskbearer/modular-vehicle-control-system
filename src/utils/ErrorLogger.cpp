@@ -16,7 +16,8 @@ template<> ErrorLogger::Ptr Singleton<ErrorLogger>::_instance = nullptr;
 ErrorLogger::ErrorLogger()
 {
     _errorfile.open(_logFileName.c_str(), std::istream::app);
-    if(!_errorfile.is_open()) {
+    if(!_errorfile.is_open())
+    {
         std::cerr << "Can't open error file log...\n";
         throw FileOpenFailure(_logFileName);
     }

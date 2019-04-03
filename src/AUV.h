@@ -13,7 +13,8 @@
 #include "vehicle/Vehicle.h"
 #include "supervisor/Supervisor.h"
 
-class AUV {
+class AUV
+{
 public:
     AUV();
     ~AUV();

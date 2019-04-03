@@ -15,7 +15,8 @@ Thread::Thread() :
 
 Thread::~Thread()
 {
-    if(_running) {
+    if(_running )
+    {
         _running = false;
         _thread.join();
     }
@@ -24,7 +25,8 @@ Thread::~Thread()
 
 void Thread::start()
 {
-    if(!_running) {
+    if(!_running)
+    {
         _running = true;
         _thread = std::thread(&Thread::threadRoutine, this);
     }
@@ -33,7 +35,8 @@ void Thread::start()
 
 void Thread::stop()
 {
-    if(_running) {
+    if(_running)
+    {
         _running = false;
         _thread.join();
     }

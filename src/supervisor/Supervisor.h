@@ -10,7 +10,8 @@
 
 #include <memory>
 
-class Supervisor {
+class Supervisor
+{
 public:
     typedef std::unique_ptr<Supervisor> Ptr;
 
